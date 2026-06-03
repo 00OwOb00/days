@@ -1,324 +1,1644 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-TW" class="h-full">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>rainy day</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聽雨聲，餘生 —— 暖心陪伴空間</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter & Playpen Sans for handdrawn vibes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playpen+Sans:wght@300;400;600;800&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+                        hand: ['Playpen Sans', 'Noto Sans TC', 'sans-serif'],
+                    },
+                    colors: {
+                        fogblue: {
+                            50: '#f0f4f8',
+                            100: '#dce4ec',
+                            200: '#bdcddc',
+                            300: '#9cb4cc',
+                            400: '#7fa0c0',
+                            500: '#6488b1',
+                            600: '#4f709c',
+                            700: '#405a80',
+                            800: '#344966',
+                            900: '#2b3a51',
+                            950: '#1a2433',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Smooth transitions */
+        .fade-enter { opacity: 0; transform: scale(0.95); }
+        .fade-enter-active { opacity: 1; transform: scale(1); transition: opacity 0.5s ease, transform 0.5s ease; }
+        .fade-exit { opacity: 1; }
+        .fade-exit-active { opacity: 0; transition: opacity 0.5s ease; }
 
-  body {
-    background: #b8cfe0;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Georgia', serif;
-    overflow: hidden;
-  }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(26, 36, 51, 0.3);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 180, 204, 0.6);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 180, 204, 0.9);
+        }
 
-  /* 雨滴 */
-  .rain-container {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 0;
-  }
-  .raindrop {
-    position: absolute;
-    width: 1.5px;
-    background: linear-gradient(to bottom, transparent, rgba(180,210,230,0.7));
-    border-radius: 2px;
-    animation: fall linear infinite;
-  }
-  @keyframes fall {
-    0% { transform: translateY(-40px); opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 0.6; }
-    100% { transform: translateY(100vh); opacity: 0; }
-  }
+        /* Ambient glowing lamp pulse */
+        @keyframes lampGlow {
+            0%, 100% { box-shadow: 0 0 15px 2px rgba(253, 224, 71, 0.2); }
+            50% { box-shadow: 0 0 35px 8px rgba(253, 224, 71, 0.45); }
+        }
+        .glowing-lamp {
+            animation: lampGlow 3s infinite ease-in-out;
+        }
 
-  /* 主視窗框架 */
-  .window-frame {
-    position: relative;
-    width: min(700px, 96vw);
-    height: min(520px, 90vh);
-    background: rgba(230,242,250,0.55);
-    border: 2.5px solid rgba(180,210,230,0.7);
-    border-radius: 18px;
-    backdrop-filter: blur(6px);
-    box-shadow: 0 8px 40px rgba(100,150,190,0.18);
-    z-index: 1;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
+        /* Cassette gear rotation */
+        @keyframes rotateGear {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .spinning-gear {
+            animation: rotateGear 4s linear infinite;
+        }
+        .spinning-gear-fast {
+            animation: rotateGear 1.5s linear infinite;
+        }
 
-  /* 窗框頂部橫條 */
-  .window-top {
-    height: 32px;
-    background: rgba(180,210,230,0.45);
-    border-bottom: 1.5px solid rgba(180,210,230,0.5);
-    display: flex;
-    align-items: center;
-    padding: 0 14px;
-    gap: 7px;
-    flex-shrink: 0;
-  }
-  .dot { width: 11px; height: 11px; border-radius: 50%; }
-  .dot-r { background: #f2a49a; }
-  .dot-y { background: #f5d07a; }
-  .dot-g { background: #96d6a0; }
+        /* Subtle rain droplet falling anim */
+        @keyframes fall {
+            0% { transform: translateY(-20px); opacity: 0; }
+            50% { opacity: 0.6; }
+            100% { transform: translateY(120px); opacity: 0; }
+        }
+        .droplet {
+            animation: fall 2.5s linear infinite;
+        }
 
-  /* 窗內場景 */
-  .scene {
-    flex: 1;
-    position: relative;
-    overflow: hidden;
-  }
+        /* Gashapon shake and drop animation */
+        @keyframes gashaponShake {
+            0%, 100% { transform: rotate(0deg); }
+            20% { transform: rotate(-8deg) translateY(-2px); }
+            40% { transform: rotate(10deg) translateY(-4px); }
+            60% { transform: rotate(-10deg) translateY(-2px); }
+            80% { transform: rotate(6deg) translateY(0); }
+        }
+        .shaking-machine {
+            animation: gashaponShake 0.6s ease-in-out;
+        }
 
-  /* 窗玻璃上的大雨滴 */
-  .glass-drop {
-    position: absolute;
-    width: 2.5px;
-    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-    background: rgba(200,225,245,0.55);
-    animation: glass-fall linear infinite;
-  }
-  @keyframes glass-fall {
-    0% { top: -10px; opacity: 0; }
-    5% { opacity: 0.8; }
-    85% { opacity: 0.5; }
-    100% { top: 105%; opacity: 0; }
-  }
+        @keyframes ballDrop {
+            0% { transform: translateY(-60px) scale(0.3); opacity: 0; }
+            50% { transform: translateY(10px) scale(1.1); opacity: 1; }
+            70% { transform: translateY(-5px) scale(0.95); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        .dropping-ball {
+            animation: ballDrop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
 
-  /* 遠景：天空漸層 */
-  .sky {
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 52%;
-    background: linear-gradient(to bottom, #a8c8e0 0%, #c8dff0 60%, #daeaf6 100%);
-  }
+        /* Writing paper unfold effect */
+        .paper-unfold {
+            transform-origin: top center;
+            animation: unfold 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes unfold {
+            0% { transform: scaleY(0.1) translateY(-20px); opacity: 0; }
+            100% { transform: scaleY(1) translateY(0); opacity: 1; }
+        }
 
-  /* 遠景：模糊建築輪廓 */
-  .cityline {
-    position: absolute;
-    bottom: 48%;
-    left: 0; right: 0;
-    height: 60px;
-    opacity: 0.22;
-  }
+        @keyframes flapLeft {
+            0%, 100% { transform: rotate(15deg); }
+            50% { transform: rotate(-10deg); }
+        }
+        @keyframes flapRight {
+            0%, 100% { transform: rotate(-15deg); }
+            50% { transform: rotate(10deg); }
+        }
+        .wing-left-anim {
+            transform-origin: 35px 35px;
+            animation: flapLeft 2s infinite ease-in-out;
+        }
+        .wing-right-anim {
+            transform-origin: 65px 35px;
+            animation: flapRight 2s infinite ease-in-out;
+        }
 
-  /* 地面 */
-  .ground {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 50%;
-    background: linear-gradient(to bottom, #d8eaf5 0%, #c5d9ea 100%);
-  }
+        /* Floating effect */
+        @keyframes softFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+        .floating-bunny {
+            animation: softFloat 4s infinite ease-in-out;
+        }
 
-  /* 書桌 */
-  .desk {
-    position: absolute;
-    bottom: 22%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 82%;
-  }
+        /* Bunny happy dance */
+        @keyframes bunnyDance {
+            0%, 100% { transform: translateY(0) scale(1); }
+            25% { transform: translateY(-12px) scaleY(1.08) scaleX(0.95); }
+            50% { transform: translateY(0) scale(1) rotate(3deg); }
+            75% { transform: translateY(-8px) scaleY(1.05) rotate(-3deg); }
+        }
+        .dancing-bunny {
+            animation: bunnyDance 1s infinite ease-in-out;
+        }
 
-  /* 檯燈光暈 */
-  .lamp-glow {
-    position: absolute;
-    bottom: 88px;
-    left: 17%;
-    width: 120px;
-    height: 70px;
-    background: radial-gradient(ellipse at 50% 80%, rgba(255,240,180,0.0) 0%, rgba(255,240,180,0.0) 100%);
-    border-radius: 50%;
-    transition: background 1.5s ease;
-    pointer-events: none;
-  }
-  .lamp-glow.on {
-    background: radial-gradient(ellipse at 50% 80%, rgba(255,240,160,0.55) 0%, rgba(255,235,140,0.18) 60%, transparent 100%);
-  }
-</style>
+        /* Shaking rabbit for rejection */
+        @keyframes bunnyShake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px) rotate(-3deg); }
+            40%, 80% { transform: translateX(8px) rotate(3deg); }
+        }
+        .shaking-bunny {
+            animation: bunnyShake 0.5s ease-in-out;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-fogblue-950 text-slate-100 font-sans h-full overflow-hidden select-none">
 
-<!-- 背景雨滴 -->
-<div class="rain-container" id="rain"></div>
-
-<!-- 主視窗 -->
-<div class="window-frame">
-  <div class="window-top">
-    <div class="dot dot-r"></div>
-    <div class="dot dot-y"></div>
-    <div class="dot dot-g"></div>
-  </div>
-
-  <div class="scene">
-    <!-- 窗玻璃大雨滴 -->
-    <div id="glass-rain"></div>
-
-    <!-- 天空 -->
-    <div class="sky"></div>
-
-    <!-- 城市輪廓 SVG -->
-    <svg class="cityline" viewBox="0 0 700 60" preserveAspectRatio="none">
-      <rect x="30" y="20" width="18" height="40" fill="#7aa8c8"/>
-      <rect x="52" y="8" width="14" height="52" fill="#7aa8c8"/>
-      <rect x="70" y="26" width="22" height="34" fill="#7aa8c8"/>
-      <rect x="96" y="14" width="16" height="46" fill="#7aa8c8"/>
-      <rect x="116" y="30" width="20" height="30" fill="#7aa8c8"/>
-      <rect x="140" y="6" width="12" height="54" fill="#7aa8c8"/>
-      <rect x="156" y="18" width="18" height="42" fill="#7aa8c8"/>
-      <rect x="178" y="24" width="14" height="36" fill="#7aa8c8"/>
-      <rect x="200" y="10" width="20" height="50" fill="#7aa8c8"/>
-      <rect x="224" y="32" width="16" height="28" fill="#7aa8c8"/>
-      <rect x="250" y="16" width="22" height="44" fill="#7aa8c8"/>
-      <rect x="280" y="4" width="14" height="56" fill="#7aa8c8"/>
-      <rect x="300" y="22" width="18" height="38" fill="#7aa8c8"/>
-      <rect x="340" y="12" width="16" height="48" fill="#7aa8c8"/>
-      <rect x="362" y="28" width="20" height="32" fill="#7aa8c8"/>
-      <rect x="390" y="8" width="14" height="52" fill="#7aa8c8"/>
-      <rect x="410" y="20" width="22" height="40" fill="#7aa8c8"/>
-      <rect x="440" y="14" width="16" height="46" fill="#7aa8c8"/>
-      <rect x="462" y="30" width="18" height="30" fill="#7aa8c8"/>
-      <rect x="486" y="6" width="12" height="54" fill="#7aa8c8"/>
-      <rect x="504" y="24" width="20" height="36" fill="#7aa8c8"/>
-      <rect x="530" y="18" width="14" height="42" fill="#7aa8c8"/>
-      <rect x="550" y="10" width="22" height="50" fill="#7aa8c8"/>
-      <rect x="580" y="26" width="16" height="34" fill="#7aa8c8"/>
-      <rect x="602" y="14" width="18" height="46" fill="#7aa8c8"/>
-      <rect x="626" y="4" width="14" height="56" fill="#7aa8c8"/>
-      <rect x="646" y="22" width="20" height="38" fill="#7aa8c8"/>
-      <rect x="672" y="16" width="16" height="44" fill="#7aa8c8"/>
-    </svg>
-
-    <!-- 地面 -->
-    <div class="ground"></div>
-
-    <!-- 檯燈光暈 -->
-    <div class="lamp-glow" id="lampGlow"></div>
-
-    <!-- 書桌場景 SVG -->
-    <div class="desk">
-      <svg viewBox="0 0 560 220" width="100%" xmlns="http://www.w3.org/2000/svg">
-
-        <!-- 桌面 -->
-        <rect x="0" y="140" width="560" height="18" rx="4" fill="#c8daea" stroke="#a8c0d4" stroke-width="1"/>
-        <rect x="0" y="156" width="560" height="8" rx="2" fill="#b0cade"/>
-        <!-- 桌腳 -->
-        <rect x="30" y="164" width="14" height="50" rx="3" fill="#b0cade"/>
-        <rect x="516" y="164" width="14" height="50" rx="3" fill="#b0cade"/>
-
-        <!-- ── 檯燈 ── -->
-        <!-- 燈座 -->
-        <ellipse cx="105" cy="142" rx="18" ry="5" fill="#a8c0d4"/>
-        <!-- 燈桿 -->
-        <line x1="105" y1="137" x2="100" y2="100" stroke="#a8c0d4" stroke-width="3.5" stroke-linecap="round"/>
-        <line x1="100" y1="100" x2="112" y2="78" stroke="#a8c0d4" stroke-width="3.5" stroke-linecap="round"/>
-        <!-- 燈罩 -->
-        <path d="M96,78 Q112,68 128,78 L122,96 Q112,100 102,96 Z" fill="#e8d070" stroke="#c8b050" stroke-width="1.2"/>
-        <!-- 燈泡光點 -->
-        <circle cx="112" cy="88" r="4" fill="rgba(255,248,180,0.85)"/>
-
-        <!-- ── 復古收音機 ── -->
-        <!-- 機身 -->
-        <rect x="200" y="105" width="80" height="38" rx="7" fill="#c8daea" stroke="#a8bece" stroke-width="1.2"/>
-        <!-- 喇叭網格 -->
-        <rect x="207" y="112" width="32" height="24" rx="3" fill="#b0c8dc" stroke="#98b8cc" stroke-width="0.8"/>
-        <line x1="211" y1="116" x2="235" y2="116" stroke="#98b8cc" stroke-width="0.7"/>
-        <line x1="211" y1="120" x2="235" y2="120" stroke="#98b8cc" stroke-width="0.7"/>
-        <line x1="211" y1="124" x2="235" y2="124" stroke="#98b8cc" stroke-width="0.7"/>
-        <line x1="211" y1="128" x2="235" y2="128" stroke="#98b8cc" stroke-width="0.7"/>
-        <line x1="215" y1="112" x2="215" y2="136" stroke="#98b8cc" stroke-width="0.7"/>
-        <line x1="221" y1="112" x2="221" y2="136" stroke="#98b8cc" stroke-width="0.7"/>
-        <line x1="227" y1="112" x2="227" y2="136" stroke="#98b8cc" stroke-width="0.7"/>
-        <!-- 調頻旋鈕 -->
-        <circle cx="257" cy="119" r="7" fill="#d8e8f4" stroke="#a8bece" stroke-width="1"/>
-        <circle cx="257" cy="119" r="3.5" fill="#b8d0e4"/>
-        <!-- 電源旋鈕 -->
-        <circle cx="272" cy="128" r="5" fill="#d8e8f4" stroke="#a8bece" stroke-width="1"/>
-        <!-- 天線 -->
-        <line x1="275" y1="105" x2="282" y2="78" stroke="#a8bece" stroke-width="1.8" stroke-linecap="round"/>
-        <!-- 機底條紋 -->
-        <rect x="200" y="136" width="80" height="5" rx="0" fill="#b8d0e4" opacity="0.5"/>
-
-        <!-- ── 小書本堆 ── -->
-        <rect x="330" y="122" width="44" height="10" rx="2" fill="#d4e8d8" stroke="#b0ccb8" stroke-width="0.8"/>
-        <rect x="334" y="113" width="38" height="10" rx="2" fill="#e8d4d8" stroke="#ccb0b8" stroke-width="0.8"/>
-        <rect x="332" y="104" width="42" height="10" rx="2" fill="#d8d4e8" stroke="#b8b0cc" stroke-width="0.8"/>
-
-        <!-- ── 小咖啡杯 ── -->
-        <path d="M430,130 Q428,142 432,142 L448,142 Q452,142 450,130 Z" fill="#e8ddd0" stroke="#c8b8a8" stroke-width="1"/>
-        <ellipse cx="440" cy="130" rx="10" ry="3.5" fill="#d8ccc0" stroke="#c8b8a8" stroke-width="0.8"/>
-        <path d="M450,133 Q458,133 458,138 Q458,143 450,143" fill="none" stroke="#c8b8a8" stroke-width="1.2"/>
-        <ellipse cx="440" cy="143" rx="14" ry="3" fill="#d8ccc0" opacity="0.5"/>
-
-        <!-- ── 天使兔兔 ── -->
-        <!-- 翅膀左 -->
-        <path d="M258,95 Q238,80 240,100 Q248,105 262,103" fill="rgba(220,235,250,0.75)" stroke="#a8c0d8" stroke-width="0.8"/>
-        <!-- 翅膀右 -->
-        <path d="M298,95 Q318,80 316,100 Q308,105 294,103" fill="rgba(220,235,250,0.75)" stroke="#a8c0d8" stroke-width="0.8"/>
-        <!-- 身體 -->
-        <ellipse cx="278" cy="118" rx="22" ry="16" fill="#f0f5fa" stroke="#c8daea" stroke-width="1.2"/>
-        <!-- 頭 -->
-        <circle cx="278" cy="96" r="17" fill="#f0f5fa" stroke="#c8daea" stroke-width="1.2"/>
-        <!-- 左耳 -->
-        <ellipse cx="268" cy="76" rx="5" ry="11" fill="#f0f5fa" stroke="#c8daea" stroke-width="1.2"/>
-        <ellipse cx="268" cy="76" rx="2.5" ry="7" fill="#fce0e8"/>
-        <!-- 右耳 -->
-        <ellipse cx="288" cy="76" rx="5" ry="11" fill="#f0f5fa" stroke="#c8daea" stroke-width="1.2"/>
-        <ellipse cx="288" cy="76" rx="2.5" ry="7" fill="#fce0e8"/>
-        <!-- 眼睛（閉合彎月） -->
-        <path d="M272,94 Q274,91 276,94" fill="none" stroke="#88aacc" stroke-width="1.5" stroke-linecap="round"/>
-        <path d="M280,94 Q282,91 284,94" fill="none" stroke="#88aacc" stroke-width="1.5" stroke-linecap="round"/>
-        <!-- 臉頰紅暈 -->
-        <ellipse cx="270" cy="98" rx="4" ry="2.5" fill="rgba(255,180,190,0.35)"/>
-        <ellipse cx="286" cy="98" rx="4" ry="2.5" fill="rgba(255,180,190,0.35)"/>
-        <!-- 鼻子 -->
-        <ellipse cx="278" cy="99" rx="2" ry="1.2" fill="#f0a0b0"/>
-        <!-- 嘴巴（微笑） -->
-        <path d="M275,101 Q278,104 281,101" fill="none" stroke="#d080a0" stroke-width="1" stroke-linecap="round"/>
-        <!-- 前腳（趴著） -->
-        <ellipse cx="262" cy="132" rx="9" ry="5" fill="#f0f5fa" stroke="#c8daea" stroke-width="1"/>
-        <ellipse cx="294" cy="132" rx="9" ry="5" fill="#f0f5fa" stroke="#c8daea" stroke-width="1"/>
-        <!-- 尾巴 -->
-        <circle cx="298" cy="122" r="5" fill="#f5f8fc" stroke="#c8daea" stroke-width="0.8"/>
-
-      </svg>
+    <!-- Custom Dialog / Toast Container -->
+    <div id="toastBox" class="fixed top-6 left-1/2 -translate-x-1/2 z-50 transform scale-90 opacity-0 pointer-events-none transition-all duration-300 bg-fogblue-800 border border-fogblue-400 text-slate-100 px-6 py-3 rounded-full shadow-2xl flex items-center gap-3">
+        <span id="toastIcon" class="text-amber-300">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        </span>
+        <span id="toastMessage" class="font-medium text-sm md:text-base"></span>
     </div>
-  </div>
-</div>
 
-<script>
-  // 背景雨滴
-  const rainContainer = document.getElementById('rain');
-  for (let i = 0; i < 55; i++) {
-    const drop = document.createElement('div');
-    drop.className = 'raindrop';
-    drop.style.left = Math.random() * 100 + '%';
-    drop.style.height = (Math.random() * 18 + 10) + 'px';
-    drop.style.animationDuration = (Math.random() * 1.2 + 0.7) + 's';
-    drop.style.animationDelay = (Math.random() * 2.5) + 's';
-    drop.style.opacity = Math.random() * 0.5 + 0.2;
-    rainContainer.appendChild(drop);
-  }
+    <!-- Background Rain Overlay -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden z-0 opacity-40" id="rainContainer">
+        <!-- Rain droplets generated dynamically -->
+    </div>
 
-  // 窗玻璃上的雨滴
-  const glassRain = document.getElementById('glass-rain');
-  for (let i = 0; i < 14; i++) {
-    const drop = document.createElement('div');
-    drop.className = 'glass-drop';
-    drop.style.left = (Math.random() * 92 + 2) + '%';
-    drop.style.height = (Math.random() * 35 + 18) + 'px';
-    drop.style.animationDuration = (Math.random() * 3 + 2.5) + 's';
-    drop.style.animationDelay = (Math.random() * 4) + 's';
-    drop.style.opacity = 0;
-    glassRain.appendChild(drop);
-  }
-</script>
+    <!-- MAIN APP WRAPPER -->
+    <div class="relative w-full h-full flex flex-col items-center justify-center z-10 p-4 md:p-8">
+
+        <!-- SCREEN 1: BIRTHDAY EXPERIENCE (LAYER 1, 2, 3) -->
+        <div id="birthdayScreen" class="w-full max-w-4xl h-full flex flex-col justify-between hidden">
+            
+            <!-- STEPPER HEADER -->
+            <div class="flex items-center justify-between py-2 border-b border-fogblue-800/60">
+                <div class="flex items-center gap-2">
+                    <span class="text-sm font-hand tracking-wider text-fogblue-400">MEMORIES MODE</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="flex gap-1.5" id="stepIndicators">
+                        <span class="w-2.5 h-2.5 rounded-full bg-fogblue-500 transition-colors" id="dot1"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-fogblue-800 transition-colors" id="dot2"></span>
+                        <span class="w-2.5 h-2.5 rounded-full bg-fogblue-800 transition-colors" id="dot3"></span>
+                    </div>
+                    <button id="exitBirthdayBtn" class="hidden text-xs bg-red-950/40 hover:bg-red-900/40 text-red-300 border border-red-900/30 px-3 py-1 rounded-md transition font-hand">
+                        返回自習室
+                    </button>
+                </div>
+            </div>
+
+            <!-- LAYER CONTAINER -->
+            <div class="flex-grow flex items-center justify-center overflow-y-auto py-6" id="layerViewport">
+                
+                <!-- LAYER 1: Cloud-Rearing Dialogue Reveal -->
+                <div id="layer1" class="w-full max-w-2xl flex flex-col items-center gap-6">
+                    <div class="text-center mb-4">
+                        <h2 class="text-xl md:text-2xl font-bold tracking-wide text-fogblue-200">關於「相互雲養」</h2>
+                        <p class="text-xs text-fogblue-400 mt-1 font-hand">還記得那一天</p>
+                    </div>
+
+                    <div id="dialogueBox" class="w-full flex flex-col gap-4 bg-fogblue-900/40 p-6 md:p-8 rounded-2xl border border-fogblue-800/50 shadow-xl backdrop-blur-md max-h-[400px] overflow-y-auto">
+                        <!-- Dialogue boxes will reveal sequentially -->
+                    </div>
+
+                    <!-- Angel Bunny Surprise (Visible at dialogue end) -->
+                    <div id="bunnySurpriseArea" class="hidden flex flex-col items-center gap-4 text-center mt-4 scale-95 opacity-0 transition-all duration-1000">
+                        <div class="relative w-36 h-36 floating-bunny flex items-center justify-center" id="svgBunnyHolderL1">
+                            <!-- SVG Angel Bunny (Symmetric wings correctly set up) -->
+                        </div>
+                        <div class="bg-gradient-to-r from-fogblue-900/80 to-fogblue-800/80 p-5 rounded-2xl border border-yellow-500/20 shadow-2xl max-w-lg">
+                            <p class="text-yellow-200 font-bold text-lg md:text-xl font-hand mb-2">「寶寶，你的小兔子在這裡，一直陪著你。」</p>
+                        </div>
+                        <button id="toLayer2Btn" class="mt-2 bg-gradient-to-r from-fogblue-500 to-indigo-600 hover:from-fogblue-400 hover:to-indigo-500 text-white font-hand px-8 py-3.5 rounded-full shadow-lg font-bold transition duration-300 tracking-wider flex items-center gap-2 transform hover:scale-105">
+                            摸摸小兔子
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LAYER 2: Limited Edition Cassette Player -->
+                <div id="layer2" class="w-full max-w-2xl flex flex-col items-center gap-6 hidden">
+                    <div class="text-center">
+                        <h2 class="text-xl md:text-2xl font-bold tracking-wide text-fogblue-200">聽雨聲，餘生</h2>
+                        <p class="text-xs text-fogblue-400 mt-1 font-hand">「世界莫辜負你奮不顧身」</p>
+                    </div>
+
+                    <!-- Interactive Deck Area -->
+                    <div class="relative w-full flex flex-col md:flex-row items-center justify-center gap-8 py-4">
+                        
+                        <!-- The Single Cassette Tape "聽雨聲，餘生" -->
+                        <div id="physicalCassette" class="relative w-64 h-40 bg-gradient-to-br from-fogblue-100 to-indigo-50 text-slate-800 rounded-xl shadow-2xl p-4 border-2 border-slate-300 cursor-pointer hover:-translate-y-3 transition-all duration-500 flex flex-col justify-between group select-none">
+                            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(255,255,255,0.7),transparent)] pointer-events-none rounded-xl"></div>
+                            <!-- Cute tape design -->
+                            <div class="flex items-center justify-between border-b border-slate-300/80 pb-2">
+                                <span class="text-[10px] font-bold text-indigo-900 tracking-wider font-hand">A SIDE</span>
+                                <span class="text-[9px] bg-indigo-900 text-white px-2 py-0.5 rounded-md scale-90 font-bold">LIMITED</span>
+                            </div>
+                            <div class="flex-grow flex flex-col items-center justify-center my-1 z-10">
+                                <span class="font-bold text-lg md:text-xl text-slate-900 tracking-wide font-hand">專屬於你</span>
+                                <span class="text-[10px] text-slate-600 font-hand mt-0.5">送給寶寶 </span>
+                            </div>
+                            <!-- Transparent Cassette Windows with Cog Wheels -->
+                            <div class="bg-slate-900 text-slate-200 rounded-lg py-1 px-4 flex items-center justify-around h-11 border border-slate-400/30">
+                                <div class="w-6 h-6 border-4 border-slate-700 rounded-full flex items-center justify-center spinning-gear-holder">
+                                    <svg class="w-4 h-4 text-slate-400 gear-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 100 8 4 4 0 000-8zm0 2a2 2 0 110 4 2 2 0 010-4z"/></svg>
+                                </div>
+                                <div class="w-12 h-2.5 bg-slate-800 rounded-full relative overflow-hidden">
+                                    <div class="absolute left-0 top-0 bottom-0 bg-yellow-600/80 w-1/2 rounded-full transition-all duration-[60s]" id="tapeBar"></div>
+                                </div>
+                                <div class="w-6 h-6 border-4 border-slate-700 rounded-full flex items-center justify-center spinning-gear-holder">
+                                    <svg class="w-4 h-4 text-slate-400 gear-svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 8a4 4 0 100 8 4 4 0 000-8zm0 2a2 2 0 110 4 2 2 0 010-4z"/></svg>
+                                </div>
+                            </div>
+                            <div class="flex justify-between items-center text-[8px] text-slate-500 mt-2 font-hand">
+                                <span>Presented by 小兔 🐰</span>
+                                <span>2026.06.08 🗓️</span>
+                            </div>
+                        </div>
+
+                        <!-- Retro Cassette Radio Deck Player -->
+                        <div id="retroPlayerDeck" class="relative w-80 h-48 bg-gradient-to-b from-fogblue-800 to-fogblue-900 rounded-2xl border border-fogblue-600/50 shadow-2xl p-4 flex flex-col justify-between overflow-hidden">
+                            <!-- Metallic details -->
+                            <div class="absolute top-2 left-4 right-4 flex justify-between items-center text-slate-400 text-[10px]">
+                                <span class="font-bold tracking-wider font-hand">STEREOPHONIC CO.</span>
+                                <div class="flex gap-1 items-center">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse" id="powerLed"></span>
+                                    <span class="text-[8px] uppercase font-bold text-red-500">FM STEREO</span>
+                                </div>
+                            </div>
+
+                            <!-- Cassette Slot Holder -->
+                            <div class="relative w-full h-24 bg-fogblue-950/90 border-2 border-fogblue-700/60 rounded-lg flex items-center justify-center overflow-hidden my-4">
+                                <div id="deckPlaceholderText" class="text-xs text-fogblue-400 font-hand animate-pulse">點擊卡帶置入</div>
+                                
+                                <!-- Slid-in Visual State of Cassette inside Radio -->
+                                <div id="embeddedCassette" class="hidden w-11/12 h-5/6 bg-gradient-to-br from-slate-200 to-slate-400 text-slate-800 rounded p-1.5 flex flex-col justify-between shadow-inner relative">
+                                    <div class="flex justify-between items-center text-[7px] font-bold text-slate-600">
+                                        <span>A SIDE</span>
+                                        <span class="text-red-600" id="playStatusIndicator">STOP</span>
+                                    </div>
+                                    <div class="text-center font-bold text-xs text-slate-900 truncate font-hand">聽雨聲，餘生</div>
+                                    <div class="bg-slate-950 text-slate-300 rounded p-0.5 flex justify-center items-center gap-10">
+                                        <svg class="w-4 h-4 text-slate-500" id="deckGearLeft" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                                        <svg class="w-4 h-4 text-slate-500" id="deckGearRight" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Controls buttons row -->
+                            <div class="flex justify-between items-center">
+                                <div class="flex gap-2">
+                                    <button id="deckPlayBtn" disabled class="bg-slate-800 hover:bg-slate-700 active:bg-slate-900 border border-slate-600 text-green-400 rounded p-1.5 disabled:opacity-40 transition">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                    </button>
+                                    <button id="deckPauseBtn" disabled class="bg-slate-800 hover:bg-slate-700 active:bg-slate-900 border border-slate-600 text-yellow-400 rounded p-1.5 disabled:opacity-40 transition">
+                                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+                                    </button>
+                                </div>
+                                <span class="text-[10px] text-slate-400 font-mono" id="audioTimer">00:00 / 00:00</span>
+                                <button id="ejectBtn" class="hidden text-xs bg-red-900/40 hover:bg-red-800/40 border border-red-700/30 text-red-300 px-2 py-1 rounded font-hand">退出 ⏏</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Audio tag element for cassette song -->
+                    <audio id="cassetteAudio" preload="auto">
+                        <source id="audioSource" src="./music/song1.mp3" type="audio/mpeg">
+                    </audio>
+
+                    <!-- Layer 2 proceed section -->
+                    <div id="layer2Proceed" class="hidden text-center scale-95 opacity-0 transition-all duration-1000 mt-2">
+                        <p class="text-sm text-fogblue-300 mb-4 font-hand">卡帶徐徐旋轉，播放小兔的心聲</p>
+                        <button id="toLayer3Btn" class="bg-gradient-to-r from-fogblue-500 to-indigo-600 hover:from-fogblue-400 hover:to-indigo-500 text-white font-hand px-8 py-3.5 rounded-full shadow-lg font-bold transition duration-300 tracking-wider flex items-center gap-2 transform hover:scale-105 mx-auto">
+                            原來這是小兔唱歌的聲音
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- LAYER 3: Glowing Desk Lamp & Japanese Written Letter -->
+                <div id="layer3" class="w-full max-w-2xl flex flex-col items-center gap-6 hidden">
+                    <div class="text-center">
+                        <h2 class="text-xl md:text-2xl font-bold tracking-wide text-fogblue-200">是文字讓我們相遇</h2>
+                        <p class="text-xs text-fogblue-400 mt-1 font-hand">好喜歡寶寶的文筆</p>
+                    </div>
+
+                    <!-- Cozy Table Setup Visual with Lamp and Envelope -->
+                    <div class="relative w-full h-56 bg-fogblue-900/20 rounded-2xl border border-fogblue-800/40 shadow-xl overflow-hidden flex items-center justify-around p-4">
+                        
+                        <!-- Desk Lamp SVG representation (with interactable toggle) -->
+                        <div class="flex flex-col items-center relative z-10 cursor-pointer group" id="deskLampVisual">
+                            <div class="w-16 h-28 flex items-center justify-center" id="svgLampHolder">
+                                <!-- SVG Desk Lamp is rendered inside JS -->
+                            </div>
+                            <span id="lampTooltip" class="text-[9px] text-yellow-300 font-hand absolute -bottom-1 opacity-0 group-hover:opacity-100 transition-opacity">請開燈</span>
+                        </div>
+
+                        <!-- Envelope representation (Visible ONLY after lamp is lit) -->
+                        <div id="glowingEnvelope" class="hidden relative z-10 w-44 h-32 bg-amber-50 rounded-lg shadow-2xl border-t-8 border-amber-200 flex flex-col justify-center items-center cursor-pointer hover:rotate-2 hover:-translate-y-2 transition-all duration-500 group opacity-0">
+                            <div class="absolute inset-0 bg-gradient-to-tr from-amber-100/50 to-transparent"></div>
+                            <!-- Heart wax seal -->
+                            <div class="w-8 h-8 rounded-full bg-red-600/80 shadow-md flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                                <span class="text-xs text-white">❤️</span>
+                            </div>
+                            <span class="text-[10px] text-slate-600 font-hand font-bold mt-2 select-none">我最喜歡的寶寶 收 💌</span>
+                        </div>
+
+                        <!-- Mini Sleeping Wing Rabbit -->
+                        <div class="absolute bottom-2 right-8 w-20 h-20 floating-bunny flex items-center justify-center opacity-80 pointer-events-none" id="svgSleepingBunnyHolder">
+                            <!-- SVG Sleeping Bunny -->
+                        </div>
+                    </div>
+
+                    <!-- Beautiful Japanese Written Letter Expanded -->
+                    <div id="letterPaper" class="hidden paper-unfold w-full bg-stone-50 text-stone-800 rounded-lg p-6 md:p-8 shadow-2xl border-l-4 border-fogblue-400 relative overflow-hidden select-text">
+                        <!-- Letter grid watermarks -->
+                        <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-60"></div>
+                        
+                        <div class="relative z-10 flex flex-col justify-between h-full">
+                            <div class="border-b border-stone-200 pb-3 mb-4 flex justify-between items-center">
+                                <span class="text-xs uppercase tracking-widest text-slate-500 font-mono font-bold">Birthday Message 🌸</span>
+                                <span class="text-xs font-hand text-indigo-700">與你在一起的每天</span>
+                            </div>
+
+                            <p class="font-hand font-bold text-lg md:text-xl text-stone-900 mb-2 border-b-2 border-stone-200 pb-1 leading-loose">展信舒顏，見字如晤：</p>
+                            
+                            <p class="font-hand text-base md:text-lg text-stone-800 leading-loose text-justify indent-8 tracking-wide mb-6">
+                                與你在一起的每天，都是特別的日子，讓我可以用溫柔的眼光去看待世界，看待我自己。今天是寶寶的生日，世界上同一天生日的有那麼多，可是我希望寶寶感受到，這是專屬於你的日子，並不與任何人共享，就像這份祝福，只送給我的寶寶。
+                            </p>
+                            <p class="font-hand text-base md:text-lg text-stone-800 leading-loose text-justify indent-8 tracking-wide mb-6">
+                                親愛的，生日快樂，恭喜你將會變得更加成熟，也更有力量，願寶寶踏上的路都通往應許之處，所經的事都成為澆灌的養分，遇見的人都成為你的支持。
+                            </p>
+
+                            <div class="flex flex-col items-end mt-8 border-t border-stone-200 pt-4 font-hand">
+                                <span class="font-bold text-lg text-indigo-900 flex items-center gap-1">
+                                    最喜歡你的小兔。 ( ˘ ³˘)♥
+                                </span>
+                                <span class="text-xs text-slate-500 mt-1 font-mono">2026.06.08 🎂</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Enter Companion Room Panel -->
+                    <div id="layer3Proceed" class="hidden text-center scale-95 opacity-0 transition-all duration-1000 mt-2">
+                        <button id="toDailySpaceBtn" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white font-hand px-10 py-4 rounded-full shadow-2xl font-bold transition duration-300 tracking-wider flex items-center gap-2 transform hover:scale-105 mx-auto">
+                            小兔子要去哪裡？
+                            <svg class="w-6 h-6 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SCREEN 2: COZY COMPANION SPACE / STUDY ROOM -->
+        <div id="companionScreen" class="w-full max-w-6xl h-full flex flex-col justify-between hidden">
+            
+            <!-- HEADER BAR -->
+            <div class="flex items-center justify-between py-2.5 border-b border-fogblue-800/60">
+                <div class="flex items-center gap-3">
+                    <span class="text-lg font-bold tracking-wider text-fogblue-200">雨天自習室 🌧️</span>
+                    <span class="bg-indigo-500/10 text-indigo-300 text-xs px-2.5 py-0.5 rounded-full border border-indigo-500/20 font-hand">人，兔有寬闊的胸膛</span>
+                </div>
+                <div class="flex gap-4 items-center">
+                    <!-- Google Sheet Synced Indicator -->
+                    <span class="hidden md:inline-flex items-center gap-1.5 text-xs text-fogblue-400">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                        已連接小兔留言板
+                    </span>
+                    <!-- Back to memories hand drawn book icon -->
+                    <button id="bookMemoriesBtn" class="flex items-center gap-1.5 text-xs bg-fogblue-900/80 hover:bg-fogblue-800 border border-fogblue-700/50 px-3 py-1.5 rounded-lg transition-all text-fogblue-300 font-hand">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                        《生日回憶》
+                    </button>
+                </div>
+            </div>
+
+            <!-- CORE DESK AREA - RESPONSIVE GRID -->
+            <div class="flex-grow grid grid-cols-1 lg:grid-cols-12 gap-6 items-center overflow-y-auto py-4">
+                
+                <!-- COLUMN LEFT (5/12): Misty Window pane & Daily Message Notes -->
+                <div class="lg:col-span-5 h-full min-h-[320px] flex flex-col justify-center">
+                    <div class="bg-fogblue-900/30 border border-fogblue-800/40 rounded-2xl shadow-xl backdrop-blur-md p-4 flex flex-col gap-3 h-full justify-between">
+                        <div class="flex justify-between items-center border-b border-fogblue-800/50 pb-2">
+                            <span class="text-xs text-fogblue-300 font-bold tracking-wider font-hand">起霧的雨窗 (滑動/擦拭霧窗) 🪟</span>
+                            <button id="fogReApplyBtn" class="text-[10px] text-fogblue-400 hover:text-fogblue-200 font-hand">重新起霧 💨</button>
+                        </div>
+
+                        <!-- Canvas window area -->
+                        <div class="relative w-full flex-grow bg-slate-900/90 rounded-xl overflow-hidden min-h-[220px] flex items-center justify-center">
+                            <!-- Background rain droplets scene -->
+                            <div class="absolute inset-0 bg-blue-950/20" id="windowRainDropsBg"></div>
+                            
+                            <!-- UNDERNEATH: Handwritten Post-It Memo Sticky Note -->
+                            <div id="stickyMemoNote" class="relative z-10 w-11/12 max-w-sm bg-gradient-to-b from-yellow-100 to-yellow-200 text-slate-800 p-5 rounded shadow-2xl border-l-4 border-yellow-400 select-text">
+                                <div class="absolute top-1 right-2 text-xs text-slate-400 font-hand select-none">留言便利貼 📝</div>
+                                <div class="font-hand font-bold text-xs text-slate-500 mb-1" id="memoDate">2026.06.08</div>
+                                <p id="memoContentText" class="font-hand text-sm md:text-base leading-relaxed text-slate-800 whitespace-pre-wrap">「被發現偷偷在這裡留言了！」</p>
+                            </div>
+
+                            <!-- OVERLAY: Mist/Fog Canvas (Wiped with composite-out) -->
+                            <canvas id="fogCanvas" class="absolute inset-0 z-20 cursor-pointer w-full h-full"></canvas>
+                        </div>
+                        
+                        <p class="text-[10px] text-fogblue-400 text-center font-hand">擦拭玻璃上的霧氣，看看今天有什麼悄悄話</p>
+                    </div>
+                </div>
+
+                <!-- COLUMN CENTER (4/12): Angel Rabbit Companion Timer & Interactive Rabbit -->
+                <div class="lg:col-span-4 h-full flex flex-col justify-center">
+                    <div class="bg-fogblue-900/30 border border-fogblue-800/40 rounded-2xl shadow-xl backdrop-blur-md p-5 flex flex-col items-center justify-between gap-4 h-full">
+                        
+                        <!-- Top status badge -->
+                        <div class="flex justify-center w-full">
+                            <span id="timerStateBadge" class="bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs px-3 py-1 rounded-full font-hand">
+                                📚 你看書，小兔看你...別戳戳小兔嗷！
+                            </span>
+                        </div>
+
+                        <!-- The Wing Angel Rabbit Live State -->
+                        <div class="relative w-40 h-40 flex items-center justify-center cursor-pointer" id="interactiveRabbitArea">
+                            <div class="absolute inset-0 bg-indigo-500/5 rounded-full scale-110 pointer-events-none filter blur-lg"></div>
+                            <div id="bunnyL2Holder" class="w-full h-full floating-bunny flex items-center justify-center">
+                                <!-- SVG Rendered in Javascript with Symmetrical Wings -->
+                            </div>
+
+                            <!-- Speech dialog bubbles of Bunny (Absolute positioning) -->
+                            <div id="bunnySpeechBubble" class="absolute -top-12 left-1/2 -translate-x-1/2 bg-slate-900 border border-fogblue-700 text-slate-100 rounded-xl p-2 px-3 shadow-2xl scale-90 opacity-0 pointer-events-none transition-all duration-300 max-w-[180px] text-center z-30">
+                                <span class="text-xs font-hand font-bold text-indigo-300" id="bunnySpeechText">嗷。</span>
+                                <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2 w-3 h-3 bg-slate-900 border-r border-b border-fogblue-700 rotate-45"></div>
+                            </div>
+                        </div>
+
+                        <!-- Focus Timer Countdown display -->
+                        <div class="text-center w-full">
+                            <div class="text-4xl md:text-5xl font-mono font-bold tracking-wider text-slate-100" id="countdownDisplay">
+                                25:00
+                            </div>
+                            <!-- Small timeline track bar -->
+                            <div class="w-3/4 mx-auto bg-fogblue-950 rounded-full h-1 mt-3 overflow-hidden">
+                                <div id="timerProgress" class="bg-indigo-500 h-full w-full transition-all duration-1000"></div>
+                            </div>
+                        </div>
+
+                        <!-- Interaction Buttons Row -->
+                        <div class="flex items-center gap-3 w-full" id="timerControlsRow">
+                            <button id="pomoToggleBtn" class="flex-grow bg-indigo-600 hover:bg-indigo-500 text-white font-hand font-bold text-sm py-2 px-4 rounded-xl transition shadow-lg flex items-center justify-center gap-1.5">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+                                <span id="pomoToggleBtnText">開始專注</span>
+                            </button>
+                            <button id="pomoEarlyBreakBtn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-hand font-bold text-xs py-2 px-3 rounded-xl border border-slate-700 transition">
+                                提前休息
+                            </button>
+                        </div>
+
+                        <!-- Feeding Area (Only active/visible during Break mode) -->
+                        <div id="feedingControlsArea" class="hidden flex flex-col items-center gap-2 border-t border-fogblue-800/40 pt-2 w-full">
+                            <span class="text-[10px] text-yellow-300 font-hand">🐰 小兔肚子餓了，快餵食吧！</span>
+                            <div class="flex gap-4">
+                                <button id="feedPuddingBtn" class="bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-300 hover:to-yellow-400 text-slate-900 text-xs px-3.5 py-1.5 rounded-full font-bold shadow-md transition transform active:scale-90 flex items-center gap-1">
+                                    🍮 餵布丁
+                                </button>
+                                <button id="feedCarrotBtn" class="bg-gradient-to-r from-orange-400 to-red-500 hover:from-orange-300 hover:to-red-400 text-white text-xs px-3.5 py-1.5 rounded-full font-bold shadow-md transition transform active:scale-90 flex items-center gap-1">
+                                    🥕 餵胡蘿蔔
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- COLUMN RIGHT (3/12): Interactive Mood Gashapon Machine -->
+                <div class="lg:col-span-3 h-full flex flex-col justify-center">
+                    <div class="bg-fogblue-900/30 border border-fogblue-800/40 rounded-2xl shadow-xl backdrop-blur-md p-4 flex flex-col justify-between gap-4 h-full">
+                        <div class="border-b border-fogblue-800/50 pb-1.5 text-center">
+                            <span class="text-xs text-fogblue-300 font-bold tracking-wider font-hand">心情扭蛋機 🔮</span>
+                        </div>
+
+                        <!-- Gashapon Machine visual SVG container -->
+                        <div class="relative w-full flex-grow flex items-center justify-center" id="gashaponInteractiveArea">
+                            <div id="gashaponVisualHolder" class="w-36 h-48 flex items-center justify-center">
+                                <!-- Gashapon Machine SVG -->
+                            </div>
+                            <!-- Generated capsule falling slot drawer -->
+                            <div id="capsuleDrawer" class="absolute bottom-1 left-1/2 -translate-x-1/2 w-10 h-10 cursor-pointer hidden">
+                                <div class="w-8 h-8 rounded-full bg-indigo-400 border border-indigo-200 shadow-xl dropping-ball flex items-center justify-center relative hover:scale-110 transition-transform">
+                                    <div class="absolute inset-0 bg-gradient-to-tr from-white/30 to-transparent rounded-full"></div>
+                                    <span class="text-[10px]">✨</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Select mood form with complete names -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-[10px] text-slate-400 font-hand text-center">今天的心情如何呢？（點選後點擊扭蛋機）</label>
+                            <div class="grid grid-cols-5 gap-1" id="moodButtonsGroup">
+                                <button data-mood="疲憊" class="bg-fogblue-800/60 hover:bg-fogblue-700 border border-fogblue-600/30 py-2 px-1 rounded text-[10px] md:text-xs transition font-hand whitespace-nowrap text-center">💙 疲憊</button>
+                                <button data-mood="緊張" class="bg-fogblue-800/60 hover:bg-fogblue-700 border border-fogblue-600/30 py-2 px-1 rounded text-[10px] md:text-xs transition font-hand whitespace-nowrap text-center">💛 緊張</button>
+                                <button data-mood="平靜" class="bg-fogblue-800/60 hover:bg-fogblue-700 border border-fogblue-600/30 py-2 px-1 rounded text-[10px] md:text-xs transition font-hand whitespace-nowrap text-center">💚 平靜</button>
+                                <button data-mood="喜悅" class="bg-fogblue-800/60 hover:bg-fogblue-700 border border-fogblue-600/30 py-2 px-1 rounded text-[10px] md:text-xs transition font-hand whitespace-nowrap text-center">❤️ 喜悅</button>
+                                <button data-mood="想念" class="bg-fogblue-800/60 hover:bg-fogblue-700 border border-fogblue-600/30 py-2 px-1 rounded text-[10px] md:text-xs transition font-hand whitespace-nowrap text-center">💜 想念</button>
+                            </div>
+                            <!-- Old button hidden, direct click on Gashapon Machine triggers rollout -->
+                            <button id="spinGashaponBtn" class="hidden mt-1 bg-gradient-to-r from-fogblue-500 to-indigo-600 disabled:opacity-40 hover:from-fogblue-400 hover:to-indigo-500 text-white font-hand py-2 rounded-xl shadow font-bold text-xs transition">
+                                抽取每日兔兔卡片
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- FOOTER TABLE OBJECTS row -->
+            <div class="border-t border-fogblue-800/40 py-2.5 flex justify-between items-center text-xs text-slate-400 font-hand">
+                <span class="flex items-center gap-1.5">
+                    <!-- Glow Lamp triggers dev panel on 3 clicks (Minimalistic Pink Heart Clicker) -->
+                    <span id="pomoLampClicker" class="cursor-pointer text-pink-400 hover:text-pink-300 text-base">
+                        💗
+                    </span>
+                </span>
+                <span>小兔最喜歡你 🐰 </span>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- DEVELOPER/TEST MODAL DIALOG PANEL (LAMP 3 CLICKS) -->
+    <div id="devModal" class="fixed inset-0 bg-slate-950/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm hidden">
+        <div class="bg-fogblue-900 border-2 border-fogblue-600/50 rounded-2xl w-full max-w-md p-6 shadow-2xl flex flex-col gap-4">
+            <div class="flex justify-between items-center border-b border-fogblue-800/60 pb-3">
+                <h3 class="text-base font-bold text-yellow-300 font-hand flex items-center gap-1.5">
+                    ⚙️ 開發者調試面板 (神秘隱藏開關)
+                </h3>
+                <button id="closeDevModalBtn" class="text-slate-400 hover:text-white text-lg">&times;</button>
+            </div>
+
+            <!-- Operations list -->
+            <div class="flex flex-col gap-3">
+                <p class="text-xs text-slate-400">這個面板可以方便你在生日送出前，對網站的所有流程進行切換測試：</p>
+                
+                <button id="devSetBirthdayMode" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 rounded text-xs transition font-hand">
+                    [切換至生日初次體驗] (重置為首頁)
+                </button>
+
+                <button id="devSetCompanionMode" class="w-full bg-slate-800 hover:bg-slate-700 text-indigo-300 font-bold py-2 rounded text-xs transition border border-slate-700 font-hand">
+                    [直接進入日常自習室] (跳過首頁解鎖)
+                </button>
+
+                <hr class="border-fogblue-800/80">
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold text-slate-300 font-hand">1. 自訂 Google Sheets CSV 同步連結：</label>
+                    <input type="text" id="devSheetUrlInput" placeholder="請貼上您的 Google Sheet CSV 發布網址..." class="w-full bg-slate-950 border border-fogblue-700 text-slate-100 p-2 rounded text-xs font-mono focus:outline-none focus:ring-1 focus:ring-yellow-400">
+                    <p class="text-[9px] text-slate-400">
+                        設定完成後，網頁將自動讀取第一欄 (A1) 內容展示於起霧的留言板上。
+                    </p>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold text-slate-300 font-hand">2. 自訂單曲 MP3 音訊檔案路徑：</label>
+                    <input type="text" id="devAudioUrlInput" placeholder="預設路徑: ./music/song1.mp3" class="w-full bg-slate-950 border border-fogblue-700 text-slate-100 p-2 rounded text-xs font-mono focus:outline-none focus:ring-1 focus:ring-yellow-400">
+                    <p class="text-[9px] text-slate-400">若發布在 GitHub，可維持預設 `./music/song1.mp3`。</p>
+                </div>
+
+                <button id="devSaveConfigBtn" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded text-xs transition font-hand mt-1">
+                    儲存設定並套用重載
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CAPSULE DIALOG OPENED MODAL -->
+    <div id="capsuleModal" class="fixed inset-0 bg-slate-950/70 z-50 flex items-center justify-center p-4 backdrop-blur-sm hidden">
+        <div class="bg-amber-50 text-slate-800 border-4 border-amber-300 rounded-2xl w-full max-w-sm p-6 shadow-2xl flex flex-col items-center gap-4 text-center select-text relative">
+            <div class="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:12px_12px] opacity-60"></div>
+            
+            <div class="relative z-10 w-full flex flex-col items-center">
+                <span id="capsuleCardMoodBadge" class="bg-indigo-900 text-white text-xs px-3 py-1 rounded-full font-hand mb-4">
+                    想念的卡片 💜
+                </span>
+                
+                <p id="capsuleCardContent" class="font-hand font-bold text-base md:text-lg text-slate-900 leading-loose text-justify py-3 my-2 border-y border-stone-300/60 w-full">
+                    「雖然隔著螢幕，但我們的心靠得比誰都近。我也超級超級想寶寶。」
+                </p>
+
+                <div class="flex flex-col items-center mt-3 text-slate-500 text-[10px] font-hand font-semibold">
+                    <span>🐰 小兔陪伴信札</span>
+                    <span>願你讀書愉快，加油哦</span>
+                </div>
+
+                <button id="closeCapsuleModalBtn" class="mt-5 w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-2 rounded-xl text-xs transition font-hand shadow">
+                    收起卡片 🌸
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT CODE CORE LOGIC -->
+    <script>
+        // Dialog Toast Alert helper
+        function showToast(message, isSuccess = false) {
+            const toast = document.getElementById('toastBox');
+            const msgEl = document.getElementById('toastMessage');
+            const iconEl = document.getElementById('toastIcon');
+            
+            msgEl.textContent = message;
+            if(isSuccess) {
+                iconEl.innerHTML = `<svg class="w-5 h-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            } else {
+                iconEl.innerHTML = `<svg class="w-5 h-5 text-yellow-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`;
+            }
+            
+            toast.classList.remove('scale-90', 'opacity-0', 'pointer-events-none');
+            toast.classList.add('scale-100', 'opacity-100');
+            
+            setTimeout(() => {
+                toast.classList.remove('scale-100', 'opacity-100');
+                toast.classList.add('scale-90', 'opacity-0', 'pointer-events-none');
+            }, 3200);
+        }
+
+        // --- GLOBAL CONSTANTS & DATABASES ---
+        const DialogueSequence = [
+            { text: "「養兔子感覺很療癒。」", role: "she" },
+            { text: "「是很療癒。」", role: "he" },
+            { text: "「也想養了。」", role: "she" },
+            { text: "「養一隻，或是雲養一隻。」", role: "he" },
+            { text: "「雲養一隻是不錯的主意。」", role: "she" },
+            { text: "「相互雲養。」", role: "together" }
+        ];
+
+        const RabbitQuotes = [
+            "認真的寶寶好迷人！",
+            "我的寶寶最棒！",
+            "靜靜看著你的側臉，好安心。",
+            "嗷。",
+            "別戳小兔了，咬咬喔！",
+            "寶寶、寶寶。",
+            "寶寶加油！",
+            "小兔在呢。"
+        ];
+
+        const MoodCapsules = {
+            "疲憊": [
+                "累了吧？小兔張開翅膀抱抱你，充完電我們再出發。",
+                "今天的你已經超級努力了，現在什麼都不要想，小兔在呢。",
+                "辛苦啦！閉上眼睛，感受我們吹過同一陣風，帶走你所有的疲勞。"
+            ],
+            "緊張": [
+                "深呼吸，慢慢放鬆。你準備得很充分，一定沒問題！",
+                "沒關係的，平時的累積不會背叛。不管結果如何，你都是最棒的寶寶！",
+                "小兔揉揉我的寶寶。放輕鬆，一起往前走。"
+            ],
+            "平靜": [
+                "這份寧靜真好，就像我們默默陪伴著彼此的時光。寶寶讀書加油！",
+                "窗外的雨滴答滴答，屋裡有你，有小兔，這就是最完美的時刻。",
+                "在平靜的日子裡穩步前進，小兔會在旁邊一直守護這份安寧。"
+            ],
+            "喜悅": [
+                "看到寶寶開心，我的世界也跟著亮了起來。",
+                "耶！小兔陪你一起轉圈圈慶祝，快樂就是要加倍！",
+                "今天的陽光好像落進了你的眼裡，好心情一直持續下去吧！"
+            ],
+            "想念": [
+                "我的思念也剛好寄出了。閉上眼，聽見小兔的心跳聲了嗎？",
+                "雖然隔著螢幕，但我們的心靠得比誰都近。我也超級超級想寶寶。",
+                "小兔的親親已經抵達，我今天也超想寶寶！"
+            ]
+        };
+
+        // Static Symmetrical Vector SVG definitions for the Angel Rabbit
+        const SVG_ANGEL_RABBIT = `
+        <svg viewBox="0 0 100 100" class="w-full h-full">
+            <!-- Wings back layer - Symmetrical outward layout and paths -->
+            <g class="wing-left-anim" style="fill: #e0f2fe;">
+                <path d="M 35 35 C 15 25, 10 45, 35 55 C 20 55, 15 65, 38 65 Z" opacity="0.9" />
+            </g>
+            <g class="wing-right-anim" style="fill: #e0f2fe;">
+                <path d="M 65 35 C 85 25, 90 45, 65 55 C 80 55, 85 65, 62 65 Z" opacity="0.9" />
+            </g>
+            <!-- Ears -->
+            <ellipse cx="38" cy="22" rx="7" ry="18" fill="#ffffff" transform="rotate(-10, 38, 22)"/>
+            <ellipse cx="38" cy="22" rx="4" ry="14" fill="#fecdd3" transform="rotate(-10, 38, 22)"/>
+            <ellipse cx="62" cy="22" rx="7" ry="18" fill="#ffffff" transform="rotate(10, 62, 22)"/>
+            <ellipse cx="62" cy="22" rx="4" ry="14" fill="#fecdd3" transform="rotate(10, 62, 22)"/>
+            <!-- Body -->
+            <ellipse cx="50" cy="65" rx="24" ry="20" fill="#ffffff"/>
+            <!-- Head -->
+            <circle cx="50" cy="45" r="18" fill="#ffffff"/>
+            <!-- Eyes -->
+            <circle cx="43" cy="43" r="1.8" fill="#1e293b"/>
+            <circle cx="57" cy="43" r="1.8" fill="#1e293b"/>
+            <!-- Blush -->
+            <ellipse cx="39" cy="48" rx="3" ry="1.5" fill="#fda4af" opacity="0.6" />
+            <ellipse cx="61" cy="48" rx="3" ry="1.5" fill="#fda4af" opacity="0.6" />
+            <!-- Mouth/Nose -->
+            <path d="M 48 48 Q 50 51 52 48" fill="none" stroke="#f43f5e" stroke-width="1.2" stroke-linecap="round"/>
+            <!-- Golden halo above -->
+            <ellipse cx="50" cy="12" rx="10" ry="2.5" fill="none" stroke="#fde047" stroke-width="1.8" opacity="0.8"/>
+            <!-- Tiny glasses (toggled on focus mode) -->
+            <g id="bunnyGlasses" class="hidden" stroke="#1e293b" stroke-width="1" fill="none">
+                <circle cx="43" cy="43" r="4" />
+                <circle cx="57" cy="43" r="4" />
+                <line x1="47" y1="43" x2="53" y2="43" />
+            </g>
+        </svg>`;
+
+        const SVG_COZY_LAMP = (glowClass = "text-yellow-300/30") => `
+        <svg viewBox="0 0 100 120" class="w-full h-full">
+            <!-- Glow Beam -->
+            <polygon id="lampGlowBeam" points="50,42 0,120 100,120" fill="url(#lampGrad)" class="transition-opacity duration-500 opacity-0" />
+            <!-- Base -->
+            <ellipse cx="50" cy="105" rx="20" ry="6" fill="#475569" />
+            <!-- Arm rod -->
+            <path d="M 50 105 Q 40 80 50 48" fill="none" stroke="#64748b" stroke-width="4" stroke-linecap="round" />
+            <!-- Lamp Head -->
+            <path d="M 38 48 Q 50 35 62 48 Z" fill="#94a3b8" />
+            <ellipse cx="50" cy="48" rx="12" ry="3" fill="#cbd5e1" />
+            <!-- Bulb glowing core -->
+            <circle cx="50" cy="50" r="4" fill="#fef08a" class="glowing-lamp" />
+            <!-- SVG Gradient definitions -->
+            <defs>
+                <linearGradient id="lampGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#fda4af" stop-opacity="0" />
+                    <stop offset="30%" stop-color="#fde047" stop-opacity="0.25" />
+                    <stop offset="100%" stop-color="#fde047" stop-opacity="0" />
+                </linearGradient>
+            </defs>
+        </svg>`;
+
+        const SVG_GASHAPON = `
+        <svg viewBox="0 0 100 130" class="w-full h-full">
+            <!-- Machine base -->
+            <rect x="25" y="70" width="50" height="40" rx="6" fill="#475569" />
+            <rect x="28" y="73" width="44" height="34" rx="4" fill="#334155" />
+            <!-- Transparent globe -->
+            <circle cx="50" cy="45" r="28" fill="none" stroke="#64748b" stroke-width="3" />
+            <circle cx="50" cy="45" r="26" fill="#94a3b8" opacity="0.15" />
+            <!-- Mini toy balls inside -->
+            <circle cx="42" cy="48" r="6" fill="#fecdd3" opacity="0.8"/>
+            <circle cx="56" cy="52" r="5" fill="#fed7aa" opacity="0.8"/>
+            <circle cx="48" cy="38" r="6.5" fill="#bfdbfe" opacity="0.8"/>
+            <circle cx="60" cy="42" r="5.5" fill="#bbf7d0" opacity="0.8"/>
+            <circle cx="38" cy="36" r="5" fill="#fef08a" opacity="0.8"/>
+            <!-- Spindle knob twist -->
+            <circle cx="50" cy="85" r="10" fill="#cbd5e1" />
+            <line x1="50" y1="77" x2="50" y2="93" stroke="#475569" stroke-width="3.5" stroke-linecap="round" />
+            <!-- Spit out gate drawer -->
+            <rect x="42" y="96" width="16" height="10" rx="2" fill="#1e293b" />
+        </svg>`;
+
+        // App state variables
+        let AppState = {
+            currentScreen: 'birthday', // 'birthday' or 'companion'
+            birthdayStep: 1, // 1, 2, 3
+            lampClickCount: 0,
+            
+            // Audio settings
+            audioLoaded: false,
+            audioPlaying: false,
+            customAudioUrl: '',
+
+            // Google Sheets configurations
+            googleSheetsUrl: '',
+            stickyNotesText: '哈囉寶寶！擦掉雨窗上的霧氣，就看到我今天的祝福囉！備考路上辛苦了，小兔一直都在！',
+
+            // Pomodoro settings
+            pomoSeconds: 25 * 60, // 25 mins
+            pomoMaxSeconds: 25 * 60,
+            pomoInterval: null,
+            pomoState: 'idle', // 'idle', 'focusing', 'resting'
+            bunnyInteractiveState: 'neutral', // 'neutral', 'focus_glasses', 'eating', 'refusing'
+        };
+
+        const STORAGE_KEY_CONFIG = 'bday_rabbit_study_config';
+
+        // --- DOM REFERENCE UTILS ---
+        const bdayScreen = document.getElementById('birthdayScreen');
+        const compScreen = document.getElementById('companionScreen');
+        const stepIndicators = document.getElementById('stepIndicators');
+        const layerViewport = document.getElementById('layerViewport');
+
+        // --- 1. INITIALIZE APP CONFIG ---
+        window.onload = function() {
+            loadConfigFromStorage();
+            initRainEffect();
+            renderVectorSvgs();
+            evaluateApplicationRoute();
+            setupWindowFogWipe();
+            initPomoTimer();
+            initEventHandlers();
+        };
+
+        function loadConfigFromStorage() {
+            const raw = localStorage.getItem(STORAGE_KEY_CONFIG);
+            if(raw) {
+                try {
+                    const parsed = JSON.parse(raw);
+                    AppState.currentScreen = parsed.currentScreen || 'birthday';
+                    AppState.googleSheetsUrl = parsed.googleSheetsUrl || '';
+                    AppState.customAudioUrl = parsed.customAudioUrl || '';
+                    
+                    document.getElementById('devSheetUrlInput').value = AppState.googleSheetsUrl;
+                    document.getElementById('devAudioUrlInput').value = AppState.customAudioUrl;
+                    
+                    if (AppState.customAudioUrl) {
+                        document.getElementById('audioSource').src = AppState.customAudioUrl;
+                        document.getElementById('cassetteAudio').load();
+                    }
+                } catch(e) {
+                    console.error("Config loaded failure: ", e);
+                }
+            }
+        }
+
+        function saveConfigToStorage() {
+            const dataToSave = {
+                currentScreen: AppState.currentScreen,
+                googleSheetsUrl: AppState.googleSheetsUrl,
+                customAudioUrl: AppState.customAudioUrl
+            };
+            localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(dataToSave));
+        }
+
+        function evaluateApplicationRoute() {
+            if(AppState.currentScreen === 'companion') {
+                bdayScreen.classList.add('hidden');
+                compScreen.classList.remove('hidden');
+                document.getElementById('exitBirthdayBtn').classList.add('hidden');
+                triggerGoogleSheetsFetch();
+                resetFogCanvas();
+            } else {
+                compScreen.classList.add('hidden');
+                bdayScreen.classList.remove('hidden');
+                routeBirthdaySteps();
+            }
+        }
+
+        // SVG Render helpers
+        function renderVectorSvgs() {
+            document.getElementById('svgBunnyHolderL1').innerHTML = SVG_ANGEL_RABBIT;
+            document.getElementById('svgSleepingBunnyHolder').innerHTML = SVG_ANGEL_RABBIT;
+            document.getElementById('bunnyL2Holder').innerHTML = SVG_ANGEL_RABBIT;
+            
+            document.getElementById('svgLampHolder').innerHTML = SVG_COZY_LAMP();
+            document.getElementById('gashaponVisualHolder').innerHTML = SVG_GASHAPON;
+        }
+
+        // Ambient rain simulation in background
+        function initRainEffect() {
+            const container = document.getElementById('rainContainer');
+            container.innerHTML = '';
+            const screenWidth = window.innerWidth;
+            const dropCount = Math.floor(screenWidth / 35);
+            
+            for(let i=0; i<dropCount; i++) {
+                const drop = document.createElement('div');
+                drop.className = 'droplet absolute bg-sky-200/40 rounded-full';
+                drop.style.left = `${Math.random() * 100}%`;
+                drop.style.top = `${Math.random() * -20}px`;
+                drop.style.width = '1px';
+                drop.style.height = `${10 + Math.random() * 20}px`;
+                drop.style.animationDelay = `${Math.random() * 4}s`;
+                drop.style.animationDuration = `${1.5 + Math.random() * 2}s`;
+                container.appendChild(drop);
+            }
+        }
+
+        // --- STREAMING_CHUNK: Managing Step Progression... ---
+        // --- 2. LAYER 1: DIALOGUE REVEAL CONTROL ---
+        function routeBirthdaySteps() {
+            document.getElementById('dot1').className = `w-2.5 h-2.5 rounded-full transition-colors ${AppState.birthdayStep >= 1 ? 'bg-indigo-400' : 'bg-fogblue-800'}`;
+            document.getElementById('dot2').className = `w-2.5 h-2.5 rounded-full transition-colors ${AppState.birthdayStep >= 2 ? 'bg-indigo-400' : 'bg-fogblue-800'}`;
+            document.getElementById('dot3').className = `w-2.5 h-2.5 rounded-full transition-colors ${AppState.birthdayStep >= 3 ? 'bg-indigo-400' : 'bg-fogblue-800'}`;
+
+            document.getElementById('layer1').classList.add('hidden');
+            document.getElementById('layer2').classList.add('hidden');
+            document.getElementById('layer3').classList.add('hidden');
+
+            const exitBtn = document.getElementById('exitBirthdayBtn');
+            const stored = localStorage.getItem(STORAGE_KEY_CONFIG);
+            if(stored && JSON.parse(stored).currentScreen === 'companion') {
+                exitBtn.classList.remove('hidden');
+            } else {
+                exitBtn.classList.add('hidden');
+            }
+
+            if(AppState.birthdayStep === 1) {
+                document.getElementById('layer1').classList.remove('hidden');
+                triggerDialogueSequence();
+            } else if(AppState.birthdayStep === 2) {
+                document.getElementById('layer2').classList.remove('hidden');
+                initCassetteTapeInteractive();
+            } else if(AppState.birthdayStep === 3) {
+                document.getElementById('layer3').classList.remove('hidden');
+                initLayer3Interactive();
+            }
+        }
+
+        function triggerDialogueSequence() {
+            const container = document.getElementById('dialogueBox');
+            container.innerHTML = '';
+            let currentIdx = 0;
+            document.getElementById('bunnySurpriseArea').classList.add('hidden');
+
+            function displayNextMessage() {
+                if(currentIdx < DialogueSequence.length) {
+                    const row = DialogueSequence[currentIdx];
+                    const bubble = document.createElement('div');
+                    
+                    if(row.role === 'she') {
+                        bubble.className = "self-start bg-slate-800 text-slate-100 border border-slate-700/60 p-3.5 rounded-2xl rounded-tl-none text-sm font-hand max-w-sm shadow-md opacity-90";
+                    } else if(row.role === 'he') {
+                        bubble.className = "self-end bg-fogblue-800/80 text-white border border-indigo-700/40 p-3.5 rounded-2xl rounded-tr-none text-sm font-hand max-w-sm shadow-md opacity-95";
+                    } else { 
+                        bubble.className = "self-center bg-gradient-to-r from-amber-950/40 to-indigo-950/40 text-yellow-200 border border-amber-600/40 p-4 rounded-xl text-center font-bold text-base font-hand max-w-md shadow-2xl scale-105 my-2";
+                    }
+
+                    bubble.textContent = row.text;
+                    container.appendChild(bubble);
+                    
+                    container.scrollTop = container.scrollHeight;
+                    currentIdx++;
+                    setTimeout(displayNextMessage, 1500);
+                } else {
+                    const surprise = document.getElementById('bunnySurpriseArea');
+                    surprise.classList.remove('hidden');
+                    setTimeout(() => {
+                        surprise.classList.remove('scale-95', 'opacity-0');
+                        surprise.classList.add('scale-100', 'opacity-100');
+                    }, 50);
+                }
+            }
+            displayNextMessage();
+        }
+
+        // --- STREAMING_CHUNK: Setting up Cassette Tape Interactions... ---
+        // --- 3. LAYER 2: CASSETTE TAPE CONTROL ---
+        function initCassetteTapeInteractive() {
+            const tape = document.getElementById('physicalCassette');
+            const embedded = document.getElementById('embeddedCassette');
+            const placeholderText = document.getElementById('deckPlaceholderText');
+            
+            const playBtn = document.getElementById('deckPlayBtn');
+            const pauseBtn = document.getElementById('deckPauseBtn');
+            const ejectBtn = document.getElementById('ejectBtn');
+            
+            const audio = document.getElementById('cassetteAudio');
+            const timerDisplay = document.getElementById('audioTimer');
+            const proceedSec = document.getElementById('layer2Proceed');
+
+            // Reset UI states
+            playBtn.disabled = true;
+            pauseBtn.disabled = true;
+            proceedSec.classList.add('hidden');
+            proceedSec.classList.add('scale-95', 'opacity-0');
+
+            tape.onclick = function() {
+                tape.classList.add('scale-0', 'pointer-events-none');
+                setTimeout(() => {
+                    tape.classList.add('hidden');
+                    placeholderText.classList.add('hidden');
+                    embedded.classList.remove('hidden');
+                    
+                    playBtn.disabled = false;
+                    pauseBtn.disabled = false;
+                    ejectBtn.classList.remove('hidden');
+                    
+                    showToast("卡帶已成功推入收音機！點擊播放按鈕開始播放 🎶", true);
+                }, 400);
+            };
+
+            audio.ontimeupdate = function() {
+                const current = formatAudioTime(audio.currentTime);
+                const total = formatAudioTime(audio.duration || 0);
+                timerDisplay.textContent = `${current} / ${total}`;
+                
+                const pct = (audio.currentTime / (audio.duration || 1)) * 100;
+                document.getElementById('tapeBar').style.width = `${pct}%`;
+            };
+
+            audio.onplay = function() {
+                AppState.audioPlaying = true;
+                document.getElementById('playStatusIndicator').textContent = "PLAYING";
+                document.getElementById('playStatusIndicator').className = "text-green-500 font-bold";
+                
+                document.getElementById('deckGearLeft').classList.add('spinning-gear');
+                document.getElementById('deckGearRight').classList.add('spinning-gear');
+                
+                proceedSec.classList.remove('hidden');
+                setTimeout(() => {
+                    proceedSec.classList.remove('scale-95', 'opacity-0');
+                    proceedSec.classList.add('scale-100', 'opacity-100');
+                }, 300);
+            };
+
+            audio.onpause = function() {
+                AppState.audioPlaying = false;
+                document.getElementById('playStatusIndicator').textContent = "PAUSED";
+                document.getElementById('playStatusIndicator').className = "text-yellow-500 font-bold";
+                
+                document.getElementById('deckGearLeft').classList.remove('spinning-gear');
+                document.getElementById('deckGearRight').classList.remove('spinning-gear');
+            };
+
+            audio.onended = function() {
+                AppState.audioPlaying = false;
+                document.getElementById('playStatusIndicator').textContent = "STOPPED";
+                document.getElementById('deckGearLeft').classList.remove('spinning-gear');
+                document.getElementById('deckGearRight').classList.remove('spinning-gear');
+            };
+
+            playBtn.onclick = () => {
+                audio.play().catch(e => {
+                    showToast("未偵測到自訂音樂檔，將啟動虛擬播放展示 🎹");
+                    simulateVisualPlay();
+                });
+            };
+            pauseBtn.onclick = () => { audio.pause(); simulateVisualPause(); };
+
+            ejectBtn.onclick = () => {
+                audio.pause();
+                audio.currentTime = 0;
+                simulateVisualPause();
+                
+                embedded.classList.add('hidden');
+                placeholderText.classList.remove('hidden');
+                tape.classList.remove('hidden', 'scale-0', 'pointer-events-none');
+                
+                playBtn.disabled = true;
+                pauseBtn.disabled = true;
+                ejectBtn.classList.add('hidden');
+                proceedSec.classList.add('hidden');
+            };
+        }
+
+        function formatAudioTime(seconds) {
+            if (isNaN(seconds)) return "00:00";
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        let simInterval = null;
+        function simulateVisualPlay() {
+            if (AppState.audioPlaying) return;
+            AppState.audioPlaying = true;
+            document.getElementById('playStatusIndicator').textContent = "PLAYING";
+            document.getElementById('playStatusIndicator').className = "text-green-500 font-bold";
+            document.getElementById('deckGearLeft').classList.add('spinning-gear');
+            document.getElementById('deckGearRight').classList.add('spinning-gear');
+            
+            const proceedSec = document.getElementById('layer2Proceed');
+            proceedSec.classList.remove('hidden');
+            setTimeout(() => {
+                proceedSec.classList.remove('scale-95', 'opacity-0');
+                proceedSec.classList.add('scale-100', 'opacity-100');
+            }, 300);
+
+            let mockSec = 0;
+            clearInterval(simInterval);
+            simInterval = setInterval(() => {
+                mockSec++;
+                const curStr = formatAudioTime(mockSec);
+                document.getElementById('audioTimer').textContent = `${curStr} / 04:20`;
+                document.getElementById('tapeBar').style.width = `${(mockSec/260)*100}%`;
+                if(mockSec >= 260) {
+                    clearInterval(simInterval);
+                    simulateVisualPause();
+                }
+            }, 1000);
+        }
+
+        function simulateVisualPause() {
+            AppState.audioPlaying = false;
+            clearInterval(simInterval);
+            document.getElementById('playStatusIndicator').textContent = "STOPPED";
+            document.getElementById('playStatusIndicator').className = "text-yellow-500 font-bold";
+            document.getElementById('deckGearLeft').classList.remove('spinning-gear');
+            document.getElementById('deckGearRight').classList.remove('spinning-gear');
+        }
+
+        // --- STREAMING_CHUNK: Setting up Layer 3 Lamp Toggle and Symmetrical Envelope Reveal... ---
+        // --- 4. LAYER 3: LAMP GLOW & ENVELOPE ---
+        function initLayer3Interactive() {
+            const lamp = document.getElementById('deskLampVisual');
+            const env = document.getElementById('glowingEnvelope');
+            const letter = document.getElementById('letterPaper');
+            const proceedSec = document.getElementById('layer3Proceed');
+            const lampTooltip = document.getElementById('lampTooltip');
+            let lampLit = false;
+
+            // Initialize states
+            env.classList.add('hidden', 'opacity-0');
+            lampTooltip.textContent = "請開燈";
+
+            lamp.onclick = function() {
+                lampLit = !lampLit;
+                const glowBeam = document.getElementById('lampGlowBeam');
+                if (glowBeam) {
+                    glowBeam.style.opacity = lampLit ? "1" : "0";
+                }
+                
+                if (lampLit) {
+                    lampTooltip.textContent = "檯燈已溫暖亮起";
+                    showToast("檯燈灑下了溫柔溫暖的鵝黃光束！💡", true);
+                    
+                    // Reveal Envelope only after light is ON
+                    env.classList.remove('hidden');
+                    setTimeout(() => {
+                        env.classList.remove('opacity-0');
+                        env.classList.add('opacity-100');
+                    }, 50);
+                } else {
+                    lampTooltip.textContent = "請開燈";
+                    env.classList.add('opacity-0');
+                    setTimeout(() => {
+                        env.classList.add('hidden');
+                    }, 500);
+                }
+            };
+
+            env.onclick = function() {
+                env.classList.add('scale-0', 'pointer-events-none');
+                setTimeout(() => {
+                    env.classList.add('hidden');
+                    letter.classList.remove('hidden');
+                    
+                    letter.scrollIntoView({ behavior: 'smooth' });
+
+                    setTimeout(() => {
+                        proceedSec.classList.remove('hidden');
+                        setTimeout(() => {
+                            proceedSec.classList.remove('scale-95', 'opacity-0');
+                            proceedSec.classList.add('scale-100', 'opacity-100');
+                        }, 50);
+                    }, 2500);
+                }, 400);
+            };
+        }
+
+        // --- STREAMING_CHUNK: Setting up Mist Window and Canvas Eraser... ---
+        // --- 5. COMPANION SPACE: MIST WINDOW GOGS CANVAS ---
+        let fogCtx, fogCanvas, isDrawingFog = false;
+
+        function setupWindowFogWipe() {
+            fogCanvas = document.getElementById('fogCanvas');
+            fogCtx = fogCanvas.getContext('2d');
+            
+            window.addEventListener('resize', resetFogCanvas);
+            resetFogCanvas();
+
+            function getCoords(e) {
+                const rect = fogCanvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return {
+                    x: clientX - rect.left,
+                    y: clientY - rect.top
+                };
+            }
+
+            function startDraw(e) {
+                isDrawingFog = true;
+                eraseFog(getCoords(e));
+            }
+
+            function drawMove(e) {
+                if(!isDrawingFog) return;
+                e.preventDefault();
+                eraseFog(getCoords(e));
+            }
+
+            function endDraw() {
+                isDrawingFog = false;
+            }
+
+            fogCanvas.addEventListener('mousedown', startDraw);
+            fogCanvas.addEventListener('mousemove', drawMove);
+            window.addEventListener('mouseup', endDraw);
+
+            fogCanvas.addEventListener('touchstart', startDraw);
+            fogCanvas.addEventListener('touchmove', drawMove);
+            window.addEventListener('touchend', endDraw);
+        }
+
+        function resetFogCanvas() {
+            if(!fogCanvas) return;
+            
+            fogCanvas.width = fogCanvas.offsetWidth;
+            fogCanvas.height = fogCanvas.offsetHeight;
+            
+            fogCtx.fillStyle = 'rgba(210, 225, 240, 0.94)';
+            fogCtx.fillRect(0, 0, fogCanvas.width, fogCanvas.height);
+            
+            fogCtx.font = 'bold 15px Noto Sans TC, sans-serif';
+            fogCtx.fillStyle = 'rgba(79, 112, 156, 0.8)';
+            fogCtx.textAlign = 'center';
+            fogCtx.textBaseline = 'middle';
+            fogCtx.fillText('🌬️ 用手指/滑鼠 擦拭霧窗 🌫️', fogCanvas.width / 2, fogCanvas.height / 2);
+        }
+
+        function eraseFog(point) {
+            fogCtx.globalCompositeOperation = 'destination-out';
+            fogCtx.beginPath();
+            fogCtx.arc(point.x, point.y, 25, 0, Math.PI * 2);
+            fogCtx.fill();
+        }
+
+        // --- STREAMING_CHUNK: Setting up Pomodoro Loop and Interactive Feeding... ---
+        // --- 6. POMODORO TIMER & INTERACTIVE ANGEL BUNNY ---
+        function initPomoTimer() {
+            const timerBadge = document.getElementById('timerStateBadge');
+            const display = document.getElementById('countdownDisplay');
+            const toggleBtn = document.getElementById('pomoToggleBtn');
+            const toggleBtnText = document.getElementById('pomoToggleBtnText');
+            const progress = document.getElementById('timerProgress');
+            const feedingArea = document.getElementById('feedingControlsArea');
+
+            setRabbitVisualState('neutral');
+
+            toggleBtn.onclick = function() {
+                if(AppState.pomoState === 'focusing') {
+                    pauseFocusTimer();
+                } else {
+                    startFocusTimer();
+                }
+            };
+
+            document.getElementById('pomoEarlyBreakBtn').onclick = function() {
+                if(AppState.pomoState === 'idle') {
+                    showToast("您尚未開啟計時專注喔。");
+                    return;
+                }
+                triggerBreakSession();
+            };
+
+            document.getElementById('feedPuddingBtn').onclick = () => feedRabbitWithPudding(true);
+            document.getElementById('feedCarrotBtn').onclick = () => feedRabbitWithPudding(false);
+            
+            document.getElementById('interactiveRabbitArea').onclick = function() {
+                triggerRabbitSpeechQuote();
+            };
+        }
+
+        function setRabbitVisualState(state) {
+            AppState.bunnyInteractiveState = state;
+            const bunny = document.getElementById('bunnyL2Holder');
+            if(!bunny) return;
+
+            bunny.innerHTML = SVG_ANGEL_RABBIT;
+            
+            const glasses = document.getElementById('bunnyGlasses');
+            
+            if(state === 'focus_glasses') {
+                glasses.classList.remove('hidden');
+                bunny.className = "w-full h-full floating-bunny flex items-center justify-center opacity-95";
+            } else if(state === 'eating') {
+                bunny.className = "w-full h-full dancing-bunny flex items-center justify-center";
+            } else if(state === 'refusing') {
+                bunny.className = "w-full h-full shaking-bunny flex items-center justify-center";
+            } else { 
+                glasses.classList.add('hidden');
+                bunny.className = "w-full h-full floating-bunny flex items-center justify-center";
+            }
+        }
+
+        function startFocusTimer() {
+            AppState.pomoState = 'focusing';
+            AppState.pomoMaxSeconds = 25 * 60;
+            setRabbitVisualState('focus_glasses');
+            
+            document.getElementById('timerStateBadge').textContent = "📚 小兔戴眼鏡陪你專注讀書中...";
+            document.getElementById('timerStateBadge').className = "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs px-3 py-1 rounded-full font-hand";
+            document.getElementById('pomoToggleBtnText').textContent = "暫停專注";
+            document.getElementById('feedingControlsArea').classList.add('hidden');
+
+            clearInterval(AppState.pomoInterval);
+            AppState.pomoInterval = setInterval(() => {
+                if(AppState.pomoSeconds > 0) {
+                    AppState.pomoSeconds--;
+                    updateTimerUI();
+                } else {
+                    triggerBreakSession();
+                }
+            }, 1000);
+        }
+
+        function pauseFocusTimer() {
+            AppState.pomoState = 'idle';
+            setRabbitVisualState('neutral');
+            document.getElementById('pomoToggleBtnText').textContent = "繼續專注";
+            document.getElementById('timerStateBadge').textContent = "⏸️ 專注讀書暫停中";
+            clearInterval(AppState.pomoInterval);
+        }
+
+        function triggerBreakSession() {
+            clearInterval(AppState.pomoInterval);
+            AppState.pomoState = 'resting';
+            AppState.pomoSeconds = 5 * 60; 
+            AppState.pomoMaxSeconds = 5 * 60;
+            
+            setRabbitVisualState('neutral');
+            updateTimerUI();
+            
+            document.getElementById('timerStateBadge').textContent = "🍮 休息時間！餵食翅膀小兔吧";
+            document.getElementById('timerStateBadge').className = "bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs px-3 py-1 rounded-full font-hand";
+            document.getElementById('pomoToggleBtnText').textContent = "開始專注";
+            
+            document.getElementById('feedingControlsArea').classList.remove('hidden');
+
+            showToast("專注完成囉！小兔肚子餓了，快給牠餵食吧！🍰", true);
+
+            AppState.pomoInterval = setInterval(() => {
+                if(AppState.pomoSeconds > 0) {
+                    AppState.pomoSeconds--;
+                    updateTimerUI();
+                } else {
+                    clearInterval(AppState.pomoInterval);
+                    AppState.pomoState = 'idle';
+                    AppState.pomoSeconds = 25 * 60;
+                    updateTimerUI();
+                    setRabbitVisualState('neutral');
+                    document.getElementById('feedingControlsArea').classList.add('hidden');
+                    document.getElementById('timerStateBadge').textContent = "📚 點擊下方開始下一輪專注";
+                }
+            }, 1000);
+        }
+
+        function updateTimerUI() {
+            const display = document.getElementById('countdownDisplay');
+            const progress = document.getElementById('timerProgress');
+            
+            const mins = Math.floor(AppState.pomoSeconds / 60);
+            const secs = AppState.pomoSeconds % 60;
+            display.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+            
+            const pct = (AppState.pomoSeconds / AppState.pomoMaxSeconds) * 100;
+            progress.style.width = `${pct}%`;
+        }
+
+        function triggerRabbitSpeechQuote() {
+            const bubble = document.getElementById('bunnySpeechBubble');
+            const txt = document.getElementById('bunnySpeechText');
+            
+            const randIdx = Math.floor(Math.random() * RabbitQuotes.length);
+            txt.textContent = RabbitQuotes[randIdx];
+            
+            bubble.classList.remove('scale-90', 'opacity-0', 'pointer-events-none');
+            bubble.classList.add('scale-100', 'opacity-100');
+            
+            setTimeout(() => {
+                bubble.classList.remove('scale-100', 'opacity-100');
+                bubble.classList.add('scale-90', 'opacity-0', 'pointer-events-none');
+            }, 2500);
+        }
+
+        function feedRabbitWithPudding(isPudding) {
+            if(isPudding) {
+                setRabbitVisualState('eating');
+                showToast("🍮 寶寶餵了布丁！小天使兔兔高興得張開翅膀手舞足蹈！🎉", true);
+                setTimeout(() => {
+                    setRabbitVisualState('neutral');
+                }, 2800);
+            } else {
+                setRabbitVisualState('refusing');
+                showToast("🥕 傲嬌小兔搖搖頭，拒絕了胡蘿蔔，牠只想吃布丁！ㅇㅅㅇ");
+                setTimeout(() => {
+                    setRabbitVisualState('neutral');
+                }, 1500);
+            }
+        }
+
+        // --- STREAMING_CHUNK: Setting up Mood Buttons and Gashapon Machine... ---
+        // --- 7. SOUND & MOOD GASHAPON CAPSULE MACHINE ---
+        let selectedMood = '';
+        
+        const moodBtns = document.querySelectorAll('#moodButtonsGroup button');
+        moodBtns.forEach(btn => {
+            btn.onclick = function() {
+                moodBtns.forEach(b => b.classList.remove('bg-indigo-600', 'text-white'));
+                btn.classList.add('bg-indigo-600', 'text-white');
+                selectedMood = btn.getAttribute('data-mood');
+                document.getElementById('spinGashaponBtn').disabled = false;
+            };
+        });
+
+        // Set Gashapon Machine Container Click trigger (New direct interaction method)
+        const gashaponMachine = document.getElementById('gashaponInteractiveArea');
+        gashaponMachine.classList.add('cursor-pointer');
+        gashaponMachine.onclick = function() {
+            if(!selectedMood) {
+                showToast("請先點選今天的心情喔！");
+                return;
+            }
+            
+            const machine = document.getElementById('gashaponVisualHolder');
+            const capsule = document.getElementById('capsuleDrawer');
+            
+            if (machine.classList.contains('shaking-machine')) return;
+
+            machine.classList.add('shaking-machine');
+            capsule.classList.add('hidden');
+
+            setTimeout(() => {
+                machine.classList.remove('shaking-machine');
+                
+                capsule.classList.remove('hidden');
+                showToast("🔮 扭蛋咕嚕嚕滾出來了！點擊出口處領取兔兔卡片吧！", true);
+                
+                capsule.onclick = function(e) {
+                    e.stopPropagation(); // Avoid triggering machine rollout again
+                    capsule.classList.add('hidden');
+                    revealMoodCapsuleCard(selectedMood);
+                };
+            }, 800);
+        };
+
+        function revealMoodCapsuleCard(mood) {
+            const list = MoodCapsules[mood];
+            const randIdx = Math.floor(Math.random() * list.length);
+            const quote = list[randIdx];
+            
+            document.getElementById('capsuleCardMoodBadge').textContent = `${mood}的卡片 💌`;
+            document.getElementById('capsuleCardContent').textContent = quote;
+            
+            document.getElementById('capsuleModal').classList.remove('hidden');
+        }
+
+        document.getElementById('closeCapsuleModalBtn').onclick = function() {
+            document.getElementById('capsuleModal').classList.add('hidden');
+            moodBtns.forEach(b => b.classList.remove('bg-indigo-600', 'text-white'));
+            selectedMood = '';
+        };
+
+        // --- 8. GOOGLE SHEETS SYNC IMPLEMENTATION (CSV NO DATABASE) ---
+        function triggerGoogleSheetsFetch() {
+            if(!AppState.googleSheetsUrl) {
+                displayFallbackLocalMessage();
+                return;
+            }
+
+            fetch(AppState.googleSheetsUrl)
+                .then(res => {
+                    if (!res.ok) throw new Error("Fetch error");
+                    return res.text();
+                })
+                .then(data => {
+                    const parsedMessage = parseCSVData(data);
+                    if(parsedMessage) {
+                        AppState.stickyNotesText = parsedMessage;
+                        document.getElementById('memoContentText').textContent = parsedMessage;
+                        showToast("已成功與雲端留言板完成即時同步！💬", true);
+                    } else {
+                        displayFallbackLocalMessage();
+                    }
+                })
+                .catch(err => {
+                    console.warn("Unable to fetch sheet data, using fallback: ", err);
+                    displayFallbackLocalMessage();
+                });
+        }
+
+        function parseCSVData(csvText) {
+            const rows = csvText.split(/\r?\n/);
+            if (rows.length === 0) return null;
+            
+            const todayStr = getTodayFormattedDate();
+            
+            for(let i=0; i<rows.length; i++) {
+                const cols = rows[i].split(',');
+                if(cols.length >= 2) {
+                    const cleanDate = cols[0].replace(/"/g, '').trim();
+                    const cleanMsg = cols[1].replace(/"/g, '').trim();
+                    if(cleanDate === todayStr || cleanDate.toLowerCase() === 'date') {
+                        if(cleanDate !== 'date') return cleanMsg;
+                    }
+                }
+            }
+            
+            if(rows.length > 1) {
+                const cols = rows[1].split(',');
+                if (cols.length >= 2) {
+                    return cols[1].replace(/"/g, '').trim();
+                }
+            }
+            return null;
+        }
+
+        function getTodayFormattedDate() {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = (now.getMonth() + 1).toString().padStart(2, '0');
+            const d = now.getDate().toString().padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function displayFallbackLocalMessage() {
+            const todayStr = getTodayFormattedDate();
+            document.getElementById('memoDate').textContent = todayStr;
+            document.getElementById('memoContentText').textContent = "「哈囉寶寶！今天的你已經超級努力了，擦乾視窗玻璃，小兔張開小翅膀抱抱你，充完電我們再出發！」";
+        }
+
+        // --- STREAMING_CHUNK: Setting up Page Routes and Modals Binds... ---
+        // --- 9. EVENT HANDLERS & MODAL ROUTING CONTROLS ---
+        function initEventHandlers() {
+            document.getElementById('toLayer2Btn').onclick = () => {
+                AppState.birthdayStep = 2;
+                routeBirthdaySteps();
+            };
+            document.getElementById('toLayer3Btn').onclick = () => {
+                AppState.birthdayStep = 3;
+                routeBirthdaySteps();
+            };
+            document.getElementById('toDailySpaceBtn').onclick = () => {
+                AppState.currentScreen = 'companion';
+                saveConfigToStorage();
+                evaluateApplicationRoute();
+            };
+
+            document.getElementById('exitBirthdayBtn').onclick = () => {
+                AppState.currentScreen = 'companion';
+                evaluateApplicationRoute();
+            };
+
+            document.getElementById('bookMemoriesBtn').onclick = () => {
+                AppState.currentScreen = 'birthday';
+                AppState.birthdayStep = 1;
+                evaluateApplicationRoute();
+            };
+
+            document.getElementById('fogReApplyBtn').onclick = () => {
+                resetFogCanvas();
+                showToast("雨玻璃窗已重新凝結霧霜。🌬️", true);
+            };
+
+            let lampClicks = 0;
+            document.getElementById('pomoLampClicker').onclick = () => {
+                lampClicks++;
+                if(lampClicks >= 3) {
+                    lampClicks = 0;
+                    document.getElementById('devModal').classList.remove('hidden');
+                }
+            };
+
+            document.getElementById('closeDevModalBtn').onclick = () => {
+                document.getElementById('devModal').classList.add('hidden');
+            };
+
+            document.getElementById('devSetBirthdayMode').onclick = () => {
+                AppState.currentScreen = 'birthday';
+                AppState.birthdayStep = 1;
+                saveConfigToStorage();
+                document.getElementById('devModal').classList.add('hidden');
+                evaluateApplicationRoute();
+            };
+
+            document.getElementById('devSetCompanionMode').onclick = () => {
+                AppState.currentScreen = 'companion';
+                saveConfigToStorage();
+                document.getElementById('devModal').classList.add('hidden');
+                evaluateApplicationRoute();
+            };
+
+            document.getElementById('devSaveConfigBtn').onclick = () => {
+                AppState.googleSheetsUrl = document.getElementById('devSheetUrlInput').value.trim();
+                AppState.customAudioUrl = document.getElementById('devAudioUrlInput').value.trim();
+                
+                saveConfigToStorage();
+                document.getElementById('devModal').classList.add('hidden');
+                showToast("調試參數設定儲存完成！即將為您重新載入頁面...", true);
+                
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            };
+        }
+    </script>
 </body>
 </html>
