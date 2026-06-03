@@ -838,6 +838,20 @@
 
         const STORAGE_KEY_CONFIG = 'bday_rabbit_study_config';
 
+        // Helper to convert /pubhtml to /pub?output=csv automatically for bulletproof fetch
+        function cleanSheetsUrl(url) {
+            if (!url) return "";
+            let clean = url.trim();
+            if (clean.includes('/pubhtml')) {
+                clean = clean.replace('/pubhtml', '/pub?output=csv');
+            }
+            if (clean.includes('/pub') && !clean.includes('output=csv')) {
+                let sep = clean.includes('?') ? '&' : '?';
+                clean = clean + sep + 'output=csv';
+            }
+            return clean;
+        }
+
         // --- DOM REFERENCE UTILS ---
         const bdayScreen = document.getElementById('birthdayScreen');
         const compScreen = document.getElementById('companionScreen');
@@ -861,7 +875,7 @@
                 try {
                     const parsed = JSON.parse(raw);
                     AppState.currentScreen = parsed.currentScreen || 'birthday';
-                    AppState.googleSheetsUrl = parsed.googleSheetsUrl || '';
+                    AppState.googleSheetsUrl = cleanSheetsUrl(parsed.googleSheetsUrl || '');
                     AppState.customAudioUrl = parsed.customAudioUrl || '';
                     
                     document.getElementById('devSheetUrlInput').value = AppState.googleSheetsUrl;
@@ -880,7 +894,7 @@
         function saveConfigToStorage() {
             const dataToSave = {
                 currentScreen: AppState.currentScreen,
-                googleSheetsUrl: AppState.googleSheetsUrl,
+                googleSheetsUrl: cleanSheetsUrl(AppState.googleSheetsUrl),
                 customAudioUrl: AppState.customAudioUrl
             };
             localStorage.setItem(STORAGE_KEY_CONFIG, JSON.stringify(dataToSave));
@@ -1504,8 +1518,12 @@
                 return;
             }
 
-            // 加入當前時間戳記避免瀏覽器與 CDN 快取，強制獲取最新內容
-            const cacheBusterUrl = AppState.googleSheetsUrl + '&t=' + new Date().getTime();
+            // Clean the URL first in case it is configured raw
+            const targetUrl = cleanSheetsUrl(AppState.googleSheetsUrl);
+
+            // Correctly determine if we need a "?" or "&" before the cache buster timestamp parameter
+            const separator = targetUrl.includes('?') ? '&' : '?';
+            const cacheBusterUrl = targetUrl + separator + 't=' + new Date().getTime();
 
             fetch(cacheBusterUrl)
                 .then(res => {
@@ -1517,6 +1535,10 @@
                     if(parsedMessage) {
                         AppState.stickyNotesText = parsedMessage;
                         document.getElementById('memoContentText').textContent = parsedMessage;
+                        
+                        // FIX: Update date element when sheets sync is successful as well!
+                        document.getElementById('memoDate').textContent = getTodayFormattedDate();
+                        
                         showToast("已成功與雲端留言板完成即時同步！💬", true);
                     } else {
                         displayFallbackLocalMessage();
@@ -1630,7 +1652,7 @@
             };
 
             document.getElementById('devSaveConfigBtn').onclick = () => {
-                AppState.googleSheetsUrl = document.getElementById('devSheetUrlInput').value.trim();
+                AppState.googleSheetsUrl = cleanSheetsUrl(document.getElementById('devSheetUrlInput').value.trim());
                 AppState.customAudioUrl = document.getElementById('devAudioUrlInput').value.trim();
                 
                 saveConfigToStorage();
