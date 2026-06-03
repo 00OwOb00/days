@@ -1293,7 +1293,7 @@
 
             document.getElementById('pomoEarlyBreakBtn').onclick = function() {
                 if(AppState.pomoState === 'idle') {
-                    showToast("要先開啟計時專注喔。");
+                    showToast("您尚未開啟計時專注喔。");
                     return;
                 }
                 triggerBreakSession();
@@ -1504,7 +1504,10 @@
                 return;
             }
 
-            fetch(AppState.googleSheetsUrl)
+            // 加入當前時間戳記避免瀏覽器與 CDN 快取，強制獲取最新內容
+            const cacheBusterUrl = AppState.googleSheetsUrl + '&t=' + new Date().getTime();
+
+            fetch(cacheBusterUrl)
                 .then(res => {
                     if (!res.ok) throw new Error("Fetch error");
                     return res.text();
