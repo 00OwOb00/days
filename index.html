@@ -328,7 +328,7 @@
 
                     <!-- Audio tag element for cassette song -->
                     <audio id="cassetteAudio" preload="auto">
-                        <source id="audioSource" src="./music/song1.mp3" type="audio/mpeg">
+                        <source id="audioSource" src="./music/song.mp3" type="audio/mpeg">
                     </audio>
 
                     <!-- Layer 2 proceed section -->
@@ -822,10 +822,10 @@
             // Audio settings
             audioLoaded: false,
             audioPlaying: false,
-            customAudioUrl: '',
+            customAudioUrl: './music/song.mp3',
 
             // Google Sheets configurations
-            googleSheetsUrl: '',
+            googleSheetsUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSOJNEamb7tQmCw0qQMsvo7ahKuKxMYyUDrCq4xGchKe280PtVqRlEJJeDDK_ehK8JY_NOUC3XnMdva/pub?output=csv',
             stickyNotesText: '哈囉寶寶！擦掉雨窗上的霧氣，就看到我今天的祝福囉！備考路上辛苦了，小兔一直都在！',
 
             // Pomodoro settings
@@ -1293,7 +1293,7 @@
 
             document.getElementById('pomoEarlyBreakBtn').onclick = function() {
                 if(AppState.pomoState === 'idle') {
-                    showToast("您尚未開啟計時專注喔。");
+                    showToast("要先開啟計時專注喔。");
                     return;
                 }
                 triggerBreakSession();
