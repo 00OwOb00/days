@@ -694,7 +694,7 @@
         ];
 
         const RabbitQuotes = [
-            "認真的寶寶好迷人！",
+            "認認真的寶寶好迷人！",
             "我的寶寶最棒！",
             "靜靜看著你的側臉，好安心。",
             "嗷。",
@@ -838,10 +838,14 @@
 
         const STORAGE_KEY_CONFIG = 'bday_rabbit_study_config';
 
-        // Helper to convert /pubhtml to /pub?output=csv automatically for bulletproof fetch
+        // Robust filter to sanitize copy-pasted Google Sheets URL and remove wrapping brackets or quotes
         function cleanSheetsUrl(url) {
             if (!url) return "";
             let clean = url.trim();
+            
+            // Completely strip out any literal square brackets [], single quotes '', double quotes "", or backticks
+            clean = clean.replace(/^[\[`'"\s]+|[\]`'"\s]+$/g, '');
+
             if (clean.includes('/pubhtml')) {
                 clean = clean.replace('/pubhtml', '/pub?output=csv');
             }
@@ -875,6 +879,8 @@
                 try {
                     const parsed = JSON.parse(raw);
                     AppState.currentScreen = parsed.currentScreen || 'birthday';
+                    
+                    // Sanitize sheets URL upon loading to prevent 'days/[' issue instantly
                     AppState.googleSheetsUrl = cleanSheetsUrl(parsed.googleSheetsUrl || '');
                     AppState.customAudioUrl = parsed.customAudioUrl || '';
                     
@@ -944,7 +950,7 @@
             }
         }
 
-        // --- STREAMING_CHUNK: Managing Step Progression... ---
+        // --- Managing Step Progression... ---
         // --- 2. LAYER 1: DIALOGUE REVEAL CONTROL ---
         function routeBirthdaySteps() {
             document.getElementById('dot1').className = `w-2.5 h-2.5 rounded-full transition-colors ${AppState.birthdayStep >= 1 ? 'bg-indigo-400' : 'bg-fogblue-800'}`;
@@ -1012,7 +1018,7 @@
             displayNextMessage();
         }
 
-        // --- STREAMING_CHUNK: Setting up Cassette Tape Interactions... ---
+        // --- Setting up Cassette Tape Interactions... ---
         // --- 3. LAYER 2: CASSETTE TAPE CONTROL ---
         function initCassetteTapeInteractive() {
             const tape = document.getElementById('physicalCassette');
@@ -1158,7 +1164,7 @@
             document.getElementById('deckGearRight').classList.remove('spinning-gear');
         }
 
-        // --- STREAMING_CHUNK: Setting up Layer 3 Lamp Toggle and Symmetrical Envelope Reveal... ---
+        // --- Setting up Layer 3 Lamp Toggle and Symmetrical Envelope Reveal... ---
         // --- 4. LAYER 3: LAMP GLOW & ENVELOPE ---
         function initLayer3Interactive() {
             const lamp = document.getElementById('deskLampVisual');
@@ -1217,8 +1223,7 @@
             };
         }
 
-        // --- STREAMING_CHUNK: Setting up Mist Window and Canvas Eraser... ---
-        // --- 5. COMPANION SPACE: MIST WINDOW GOGS CANVAS ---
+        // --- COMPANION SPACE: MIST WINDOW GOGS CANVAS ---
         let fogCtx, fogCanvas, isDrawingFog = false;
 
         function setupWindowFogWipe() {
@@ -1285,7 +1290,6 @@
             fogCtx.fill();
         }
 
-        // --- STREAMING_CHUNK: Setting up Pomodoro Loop and Interactive Feeding... ---
         // --- 6. POMODORO TIMER & INTERACTIVE ANGEL BUNNY ---
         function initPomoTimer() {
             const timerBadge = document.getElementById('timerStateBadge');
@@ -1449,7 +1453,6 @@
             }
         }
 
-        // --- STREAMING_CHUNK: Setting up Mood Buttons and Gashapon Machine... ---
         // --- 7. SOUND & MOOD GASHAPON CAPSULE MACHINE ---
         let selectedMood = '';
         
@@ -1518,7 +1521,7 @@
                 return;
             }
 
-            // Clean the URL first in case it is configured raw
+            // Clean the URL thoroughly to strip square brackets
             const targetUrl = cleanSheetsUrl(AppState.googleSheetsUrl);
 
             // Correctly determine if we need a "?" or "&" before the cache buster timestamp parameter
@@ -1590,7 +1593,6 @@
             document.getElementById('memoContentText').textContent = "「哈囉寶寶！今天的你已經超級努力了，擦乾視窗玻璃，小兔張開小翅膀抱抱你，充完電我們再出發！」";
         }
 
-        // --- STREAMING_CHUNK: Setting up Page Routes and Modals Binds... ---
         // --- 9. EVENT HANDLERS & MODAL ROUTING CONTROLS ---
         function initEventHandlers() {
             document.getElementById('toLayer2Btn').onclick = () => {
